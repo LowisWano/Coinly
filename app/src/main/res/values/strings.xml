@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Coinly</string>
+    <string name="welcome_to_coinly">Welcome to Coinly</string>
+    <string name="your_digital_coin_wallet">Your digital coin wallet</string>
+    <string name="app_logo">App Logo</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="mpin">MPIN (4 digits)</string>
+    <string name="login">Login</string>
+    <string name="forgot_mpin">Forgot MPIN?</string>
+    <string name="new_user_register_here">New User? Register Here</string>
+    <string name="invalid_phone">Please enter a valid phone number</string>
+    <string name="invalid_mpin">Please enter a valid 4-digit MPIN</string>
+    <string name="login_success">Login Successful</string>
+</resources>
