@@ -14,10 +14,10 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextInputLayout tilPhoneNumber, tilMpin;
-    private TextInputEditText etPhoneNumber, etMpin;
+    private TextInputLayout tilEmail, tilPassword;
+    private TextInputEditText etEmail, etPassword;
     private Button btnLogin;
-    private TextView tvForgotMpin, tvRegister;
+    private TextView tvForgotPassword, tvRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +32,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        tilPhoneNumber = findViewById(R.id.tilPhoneNumber);
-        tilMpin = findViewById(R.id.tilMpin);
-        etPhoneNumber = findViewById(R.id.etPhoneNumber);
-        etMpin = findViewById(R.id.etMpin);
+        tilEmail = findViewById(R.id.tilEmail);
+        tilPassword = findViewById(R.id.tilPassword);
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        tvForgotMpin = findViewById(R.id.tvForgotMpin);
+//        tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvRegister = findViewById(R.id.tvRegister);
     }
 
@@ -56,38 +56,41 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // Forgot MPIN click
-        tvForgotMpin.setOnClickListener(v -> {
-            // TODO: Implement forgot MPIN functionality
-            Toast.makeText(this, "Forgot MPIN functionality coming soon", Toast.LENGTH_SHORT).show();
-        });
+        // Forgot password click
+//        tvForgotPassword.setOnClickListener(v -> {
+//            // TODO: Implement forgot password functionality
+//            Toast.makeText(this, "Forgot password functionality coming soon", Toast.LENGTH_SHORT).show();
+//        });
 
-        // Register click
+        // Register click - Navigate to RegisterActivity with animation
         tvRegister.setOnClickListener(v -> {
-            // TODO: Implement registration functionality
-            Toast.makeText(this, "Registration functionality coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+            
+            // Apply the slide up animation
+            overridePendingTransition(R.anim.slide_up, R.anim.no_change);
         });
     }
 
     private boolean validateInputs() {
         boolean isValid = true;
         
-        // Validate phone number
-        String phoneNumber = etPhoneNumber.getText().toString().trim();
-        if (TextUtils.isEmpty(phoneNumber) || phoneNumber.length() < 10) {
-            tilPhoneNumber.setError(getString(R.string.invalid_phone));
+        // Validate email
+        String email = etEmail.getText().toString().trim();
+        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError(getString(R.string.invalid_email));
             isValid = false;
         } else {
-            tilPhoneNumber.setError(null);
+            tilEmail.setError(null);
         }
         
-        // Validate MPIN
-        String mpin = etMpin.getText().toString().trim();
-        if (TextUtils.isEmpty(mpin) || mpin.length() != 4) {
-            tilMpin.setError(getString(R.string.invalid_mpin));
+        // Validate password
+        String password = etPassword.getText().toString().trim();
+        if (TextUtils.isEmpty(password) || password.length() < 6) {
+            tilPassword.setError(getString(R.string.invalid_password));
             isValid = false;
         } else {
-            tilMpin.setError(null);
+            tilPassword.setError(null);
         }
         
         return isValid;

@@ -7,8 +7,41 @@
     <string name="mpin">MPIN (4 digits)</string>
     <string name="login">Login</string>
     <string name="forgot_mpin">Forgot MPIN?</string>
+    <string name="forgot_password">Forgot Password?</string>
     <string name="new_user_register_here">New User? Register Here</string>
     <string name="invalid_phone">Please enter a valid phone number</string>
     <string name="invalid_mpin">Please enter a valid 4-digit MPIN</string>
+    <string name="invalid_email">Please enter a valid email address</string>
+    <string name="invalid_password">Password must be at least 6 characters</string>
     <string name="login_success">Login Successful</string>
+    
+    <!-- Register page strings -->
+    <string name="register_to_coinly">Register to Coinly</string>
+    <string name="full_name">Full Name</string>
+    <string name="first_name">First Name</string>
+    <string name="mi">M.I</string>
+    <string name="last_name">Last Name</string>
+    <string name="birthday">Birthday</string>
+    <string name="day">Day</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="registration_success">Registration Successful</string>
+    
+    <!-- PIN screens strings -->
+    <string name="create_pin">Create PIN</string>
+    <string name="confirm_pin">Confirm PIN</string>
+    <string name="pin_description">Please create a 4-digit PIN that will be used to secure your account</string>
+    <string name="confirm_pin_description">Please re-enter your PIN to confirm</string>
+    <string name="pin_mismatch">PINs do not match. Please try again.</string>
+    <string name="pin_success">PIN successfully created!</string>
+    <string name="next">Next</string>
+    <string name="confirm">Confirm</string>
+    <string name="backspace">Delete</string>
+    <string name="fingerprint">Fingerprint</string>
+    
+    <!-- Login screen strings -->
+    <string name="login_to_account">Login to your account</string>
 </resources>

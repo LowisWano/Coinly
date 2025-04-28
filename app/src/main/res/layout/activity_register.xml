@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F2C9"
+    tools:context=".RegisterActivity">
+
+    <!-- Logo at the top -->
+    <ImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="100dp"
+        android:contentDescription="@string/app_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/coinly_logo_background" />
+
+    <!-- Register to Coinly Title -->
+    <TextView
+        android:id="@+id/tvRegisterTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Coinly"
+        android:textSize="55sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
+
+    <!-- Card View for the registration form - full width, rounded top corners only -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/registerCardView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvRegisterTitle">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_top_rounded_corners_only">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:id="@+id/tvRegisterHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginBottom="24dp"
+                        android:text="@string/register_to_coinly"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center_horizontal"
+                        android:textAlignment="center" />
+
+                    <!-- Full Name section -->
+                    <TextView
+                        android:id="@+id/tvFullName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/full_name"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                    <!-- First Name, Middle Initial, Last Name fields in a row -->
+                    <LinearLayout
+                        android:id="@+id/llNameFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <EditText
+                            android:id="@+id/etFirstName"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:layout_marginEnd="8dp"
+                            android:padding="12dp"
+                            android:background="@android:drawable/editbox_background"
+                            android:hint="@string/first_name"
+                            android:textColor="#000000"
+                            android:inputType="textPersonName" />
+
+                        <EditText
+                            android:id="@+id/etMiddleInitial"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.5"
+                            android:layout_marginEnd="8dp"
+                            android:padding="12dp"
+                            android:background="@android:drawable/editbox_background"
+                            android:hint="@string/mi"
+                            android:textColor="#000000"
+                            android:inputType="textPersonName" />
+
+                        <EditText
+                            android:id="@+id/etLastName"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:padding="12dp"
+                            android:background="@android:drawable/editbox_background"
+                            android:hint="@string/last_name"
+                            android:textColor="#000000"
+                            android:inputType="textPersonName" />
+                    </LinearLayout>
+
+                    <!-- Birthday section -->
+                    <TextView
+                        android:id="@+id/tvBirthday"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/birthday"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                    <!-- Day, Month, Year fields in a row -->
+                    <LinearLayout
+                        android:id="@+id/llBirthdayFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <EditText
+                            android:id="@+id/etDay"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:padding="12dp"
+                            android:background="@android:drawable/editbox_background"
+                            android:hint="@string/day"
+                            android:textColor="#000000"
+                            android:inputType="number"
+                            android:maxLength="2" />
+
+                        <EditText
+                            android:id="@+id/etMonth"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:padding="12dp"
+                            android:background="@android:drawable/editbox_background"
+                            android:hint="@string/month"
+                            android:textColor="#000000"
+                            android:inputType="number"
+                            android:maxLength="2" />
+
+                        <EditText
+                            android:id="@+id/etYear"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="12dp"
+                            android:background="@android:drawable/editbox_background"
+                            android:hint="@string/year"
+                            android:textColor="#000000"
+                            android:inputType="number"
+                            android:maxLength="4" />
+                    </LinearLayout>
+
+                    <!-- Email field -->
+                    <EditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:padding="12dp"
+                        android:background="@android:drawable/editbox_background"
+                        android:hint="@string/email"
+                        android:textColor="#000000"
+                        android:inputType="textEmailAddress" />
+
+                    <!-- Phone Number field -->
+                    <EditText
+                        android:id="@+id/etPhoneNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:padding="12dp"
+                        android:background="@android:drawable/editbox_background"
+                        android:hint="@string/phone_number"
+                        android:textColor="#000000"
+                        android:inputType="phone" />
+
+                    <!-- Password field -->
+                    <EditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:padding="12dp"
+                        android:background="@android:drawable/editbox_background"
+                        android:hint="@string/password"
+                        android:textColor="#000000"
+                        android:inputType="textPassword" />
+
+                    <!-- Spacer to push button to bottom -->
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:layout_marginTop="16dp" />
+
+                    <!-- Register button -->
+                    <Button
+                        android:id="@+id/btnRegister"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:padding="12dp"
+                        android:text="@string/register"
+                        android:backgroundTint="#F4F2C9"
+                        android:textColor="#083248" />
+
+                    <TextView
+                        android:id="@+id/tvLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="150dp"
+                        android:text="Already have an account? Login"
+                        android:textColor="#F4F2C9"
+                        android:layout_gravity="center_horizontal"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </ScrollView>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
