@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Filter Transactions"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/filterAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="All Transactions"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"/>
+
+    <TextView
+        android:id="@+id/filterIncome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Income Only"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"/>
+
+    <TextView
+        android:id="@+id/filterExpenses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Expenses Only"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"/>
+
+</LinearLayout>
