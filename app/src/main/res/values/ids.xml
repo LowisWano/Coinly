@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="nav_home" type="id"/>
+    <item name="nav_wallet" type="id"/>
+    <item name="nav_qr" type="id"/>
+    <item name="nav_transactions" type="id"/>
+    <item name="nav_profile" type="id"/>
+</resources>

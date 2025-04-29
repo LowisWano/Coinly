@@ -10,10 +10,10 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="new_user_register_here">New User? Register Here</string>
     <string name="invalid_phone">Please enter a valid phone number</string>
-    <string name="invalid_mpin">Please enter a valid 4-digit MPIN</string>
+    <string name="invalid_mpin">MPIN must be 4 digits</string>
     <string name="invalid_email">Please enter a valid email address</string>
     <string name="invalid_password">Password must be at least 6 characters</string>
-    <string name="login_success">Login Successful</string>
+    <string name="login_success">Login successful</string>
     
     <!-- Register page strings -->
     <string name="register_to_coinly">Register to Coinly</string>
