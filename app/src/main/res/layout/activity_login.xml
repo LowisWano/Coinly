@@ -9,14 +9,14 @@
 
     <ImageView
         android:id="@+id/ivLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_marginTop="100dp"
         android:contentDescription="@string/app_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/coinly_logo_background" />
+        android:background="@drawable/coinlylogo2" />
 
     <TextView
         android:id="@+id/tvWelcome"
