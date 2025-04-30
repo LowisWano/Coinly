@@ -3,12 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#041B29">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Filter Transactions"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
@@ -17,7 +19,8 @@
         android:id="@+id/filterAll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="All Transactions"
+        android:text="All"
+        android:textColor="#FFFFFF"
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"/>
 
@@ -25,7 +28,8 @@
         android:id="@+id/filterIncome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Income Only"
+        android:text="Income"
+        android:textColor="#4CAF50"
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"/>
 
@@ -33,7 +37,8 @@
         android:id="@+id/filterExpenses"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Expenses Only"
+        android:text="Expenses"
+        android:textColor="#E91E63"
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"/>
 

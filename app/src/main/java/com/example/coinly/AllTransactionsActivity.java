@@ -1,15 +1,13 @@
 package com.example.coinly;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,31 +16,34 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionHistoryActivity extends AppCompatActivity {
+public class AllTransactionsActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TransactionAdapter adapter;
     private List<Transaction> allTransactions;
     private List<Transaction> filteredTransactions;
     private EditText searchEditText;
     private ImageButton filterButton;
-
+    private TextView balanceAmount;
+    private TextView totalIncome;
+    private TextView totalExpenses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recent_transaction);
+        setContentView(R.layout.activity_all_transactions);
 
-        setupToolbar();
         setupViews();
+        setupToolbar();
         loadTransactions();
         setupSearch();
         setupFilter();
-        setupBottomNavigation();
+        updateTransactionTotals();
     }
 
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
@@ -50,28 +51,29 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.transactionsRecyclerView);
         searchEditText = findViewById(R.id.searchEditText);
         filterButton = findViewById(R.id.filterButton);
+        balanceAmount = findViewById(R.id.balanceAmount);
+        totalIncome = findViewById(R.id.totalIncome);
+        totalExpenses = findViewById(R.id.totalExpenses);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         allTransactions = new ArrayList<>();
         filteredTransactions = new ArrayList<>();
         adapter = new TransactionAdapter(filteredTransactions);
         recyclerView.setAdapter(adapter);
-
-        findViewById(R.id.viewAllTransactions).setOnClickListener(v -> {
-            Intent intent = new Intent(this, AllTransactionsActivity.class);
-            startActivity(intent);
-        });
     }
 
     private void loadTransactions() {
-        // TODO: Replace with actual data loading from database/API
+        // TODO: Replace with actual data loading from database
         allTransactions.add(new Transaction("Netflix Subscription", "January 27, 2025", -300.00));
         allTransactions.add(new Transaction("Youtube Premium", "January 26, 2025", -239.00));
-        allTransactions.add(new Transaction("24 Chicken", "January 23, 2025", 45.00));
-        allTransactions.add(new Transaction("Burp", "January 15, 2025", 19.00));
-
+        allTransactions.add(new Transaction("Salary", "January 25, 2025", 25000.00));
+        allTransactions.add(new Transaction("24 Chicken", "January 23, 2025", -450.00));
+        allTransactions.add(new Transaction("Freelance Work", "January 20, 2025", 15000.00));
+        allTransactions.add(new Transaction("Grocery Shopping", "January 18, 2025", -2500.00));
+        
         filteredTransactions.addAll(allTransactions);
         adapter.notifyDataSetChanged();
+        updateTransactionTotals();
     }
 
     private void setupSearch() {
@@ -97,7 +99,6 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(R.layout.dialog_filter_transactions);
 
-        // Setup filter options (All, Income, Expenses)
         dialog.findViewById(R.id.filterAll).setOnClickListener(v -> {
             filteredTransactions.clear();
             filteredTransactions.addAll(allTransactions);
@@ -144,32 +145,23 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    private void setupBottomNavigation() {
-        LinearLayout homeButton = findViewById(R.id.homeButton);
-        LinearLayout walletButton = findViewById(R.id.walletButton);
-        LinearLayout qrButton = findViewById(R.id.qrButton);
-        LinearLayout transactionsButton = findViewById(R.id.transactionsButton);
-        LinearLayout profileButton = findViewById(R.id.profileButton);
+    private void updateTransactionTotals() {
+        double income = 0;
+        double expenses = 0;
 
-        homeButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        });
+        for (Transaction transaction : allTransactions) {
+            if (transaction.getAmount() > 0) {
+                income += transaction.getAmount();
+            } else {
+                expenses += Math.abs(transaction.getAmount());
+            }
+        }
 
-        walletButton.setOnClickListener(v -> {
-            // TODO: Navigate to Wallet screen
-        });
-
-        qrButton.setOnClickListener(v -> {
-            // TODO: Open QR scanner
-        });
-
-        // Mark transactions button as selected
-        transactionsButton.setSelected(true);
-
-        profileButton.setOnClickListener(v -> {
-            // TODO: Navigate to Profile screen
-        });
+        double balance = income - expenses;
+        
+        balanceAmount.setText(String.format("Php %.2f", balance));
+        totalIncome.setText(String.format("+ Php %.2f", income));
+        totalExpenses.setText(String.format("- Php %.2f", expenses));
     }
 
     @Override

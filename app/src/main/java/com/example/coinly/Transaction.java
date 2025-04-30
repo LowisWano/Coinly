@@ -5,18 +5,16 @@ public class Transaction {
     private String date;
     private double amount;
     private String refNumber;
-    private int iconResourceId; // Resource ID for the transaction icon
 
     public Transaction(String title, String date, double amount) {
-        this(title, date, amount, "123123", android.R.drawable.ic_menu_report_image);
+        this(title, date, amount, "123123");
     }
 
-    public Transaction(String title, String date, double amount, String refNumber, int iconResourceId) {
+    public Transaction(String title, String date, double amount, String refNumber) {
         this.title = title;
         this.date = date;
         this.amount = amount;
         this.refNumber = refNumber;
-        this.iconResourceId = iconResourceId;
     }
 
     public String getTitle() {
@@ -33,10 +31,6 @@ public class Transaction {
 
     public String getRefNumber() {
         return refNumber;
-    }
-
-    public int getIconResourceId() {
-        return iconResourceId;
     }
 
     public String getFormattedAmount() {
