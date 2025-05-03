@@ -50,6 +50,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.transactionsRecyclerView);
         searchEditText = findViewById(R.id.searchEditText);
         filterButton = findViewById(R.id.filterButton);
+        TextView transactionCount = findViewById(R.id.transactionCount);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         allTransactions = new ArrayList<>();
@@ -58,7 +59,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         findViewById(R.id.viewAllTransactions).setOnClickListener(v -> {
-            Intent intent = new Intent(this, AllTransactionsActivity.class);
+            Intent intent = new Intent(this, RequestTransactionHistoryActivity.class);
             startActivity(intent);
         });
     }
@@ -72,6 +73,10 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
         filteredTransactions.addAll(allTransactions);
         adapter.notifyDataSetChanged();
+        
+        // Update the transaction count text
+        TextView transactionCount = findViewById(R.id.transactionCount);
+        transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
     }
 
     private void setupSearch() {
@@ -97,7 +102,6 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(R.layout.dialog_filter_transactions);
 
-        // Setup filter options (All, Income, Expenses)
         dialog.findViewById(R.id.filterAll).setOnClickListener(v -> {
             filteredTransactions.clear();
             filteredTransactions.addAll(allTransactions);
@@ -105,13 +109,13 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        dialog.findViewById(R.id.filterIncome).setOnClickListener(v -> {
-            filterByType(true);
+        dialog.findViewById(R.id.filterDeposit).setOnClickListener(v -> {
+            filterByType(true); // true for coins added
             dialog.dismiss();
         });
 
         dialog.findViewById(R.id.filterExpenses).setOnClickListener(v -> {
-            filterByType(false);
+            filterByType(false); // false for coins spent
             dialog.dismiss();
         });
 
@@ -133,11 +137,11 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    private void filterByType(boolean isIncome) {
+    private void filterByType(boolean isCoinsAdded) {
         filteredTransactions.clear();
         for (Transaction transaction : allTransactions) {
-            if ((isIncome && transaction.getAmount() > 0) ||
-                    (!isIncome && transaction.getAmount() < 0)) {
+            if ((isCoinsAdded && transaction.getAmount() > 0) ||
+                    (!isCoinsAdded && transaction.getAmount() < 0)) {
                 filteredTransactions.add(transaction);
             }
         }

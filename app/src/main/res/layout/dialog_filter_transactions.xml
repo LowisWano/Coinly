@@ -25,10 +25,10 @@
         android:background="?attr/selectableItemBackground"/>
 
     <TextView
-        android:id="@+id/filterIncome"
+        android:id="@+id/filterDeposit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Income"
+        android:text="Deposit"
         android:textColor="#4CAF50"
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"/>

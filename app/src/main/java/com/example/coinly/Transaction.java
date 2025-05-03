@@ -5,16 +5,20 @@ public class Transaction {
     private String date;
     private double amount;
     private String refNumber;
+    private String sender;
+    private String receiver;
 
     public Transaction(String title, String date, double amount) {
-        this(title, date, amount, "123123");
+        this(title, date, amount, "123123", "Unknown", "Unknown");
     }
 
-    public Transaction(String title, String date, double amount, String refNumber) {
+    public Transaction(String title, String date, double amount, String refNumber, String sender, String receiver) {
         this.title = title;
         this.date = date;
         this.amount = amount;
         this.refNumber = refNumber;
+        this.sender = sender;
+        this.receiver = receiver;
     }
 
     public String getTitle() {
@@ -31,6 +35,14 @@ public class Transaction {
 
     public String getRefNumber() {
         return refNumber;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
     }
 
     public String getFormattedAmount() {

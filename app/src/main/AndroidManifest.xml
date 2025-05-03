@@ -36,7 +36,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AllTransactionsActivity"
+            android:name=".RequestTransactionHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransactionDetailsActivity"
             android:exported="false" />
     </application>
 
