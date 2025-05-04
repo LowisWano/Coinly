@@ -40,7 +40,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="16dp"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/coinlylogo" />
+                    app:srcCompat="@drawable/coinlylogo2" />
 
             </RelativeLayout>
 
