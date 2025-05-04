@@ -8,9 +8,142 @@
     android:orientation="vertical"
     tools:context=".QRScanner">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/preview_view_scanner"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview_view_scanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.example.coinly.ScannerOverlayView
+            android:id="@+id/scanner_overlay_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/button_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="top|center_horizontal"
+            android:gravity="center_horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/image_button_upload"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@color/blue_hard"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/arrow_up_from_bracket_solid"
+                    app:tint="@color/yellow_hard"
+                    tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <Button
+                    android:id="@+id/button_upload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="20dp"
+                    android:backgroundTint="@color/transparent"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:text="@string/upload_qr"
+                    android:textColor="@color/yellow_soft"
+                    android:textSize="6pt"
+                    android:textStyle="bold"
+                    tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
+
+                <ImageButton
+                    android:id="@+id/image_button_generate_qr"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@color/blue_hard"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/plus_solid"
+                    app:tint="@color/yellow_hard"
+                    tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <Button
+                    android:id="@+id/button_generate_qr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="20dp"
+                    android:backgroundTint="@color/transparent"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:text="@string/generate_qr"
+                    android:textColor="@color/yellow_soft"
+                    android:textSize="6pt"
+                    android:textStyle="bold"
+                    tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/image_button_use_number"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@color/blue_hard"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/rocket_solid"
+                    app:tint="@color/yellow_hard"
+                    tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <Button
+                    android:id="@+id/button_use_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="20dp"
+                    android:backgroundTint="@color/transparent"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:text="@string/use_number"
+                    android:textColor="@color/yellow_soft"
+                    android:textSize="6pt"
+                    android:textStyle="bold"
+                    tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:backgroundTint="@color/blue_soft"
+            android:paddingHorizontal="40dp"
+            android:text="@string/back"
+            android:textColor="@color/yellow_hard"
+            android:textSize="10pt"
+            tools:ignore="TextSizeCheck" />
+
+    </FrameLayout>
+
+    <com.example.coinly.CustomBottomNavigation
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
