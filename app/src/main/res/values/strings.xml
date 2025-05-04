@@ -44,4 +44,10 @@
     
     <!-- Login screen strings -->
     <string name="login_to_account">Login to your account</string>
+
+    <!-- QR Scanner screen strings-->
+    <string name="back">Back</string>
+    <string name="upload_qr">Upload QR</string>
+    <string name="generate_qr">Generate QR</string>
+    <string name="use_number">Use Number</string>
 </resources>
