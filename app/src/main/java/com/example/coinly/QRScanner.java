@@ -2,9 +2,17 @@ package com.example.coinly;
 
 import android.content.pm.PackageManager;
 import android.Manifest;
+import android.graphics.RectF;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,8 +36,11 @@ import java.util.concurrent.Executors;
 
 public class QRScanner extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_CODE = 101;
+    private static final int BUTTON_LAYOUT_DP = 20;
 
     private PreviewView pvScanner;
+    private View scannerOverlay;
+    private LinearLayout buttonLayout;
 
     private BarcodeScanner scanner;
 
@@ -41,7 +52,16 @@ public class QRScanner extends AppCompatActivity {
         setContentView(R.layout.activity_qrscanner);
 
         pvScanner = findViewById(R.id.preview_view_scanner);
+        scannerOverlay = findViewById(R.id.scanner_overlay_view);
+        buttonLayout = findViewById(R.id.button_layout);
 
+        scannerOverlay.post(this::initButtonLayoutPosition);
+
+        initScanner();
+        initButtons();
+    }
+
+    private void initScanner() {
         scanner = BarcodeScanning.getClient();
         cameraExecutor = Executors.newSingleThreadExecutor();
 
@@ -53,6 +73,44 @@ public class QRScanner extends AppCompatActivity {
                     new String[]{Manifest.permission.CAMERA},
                     CAMERA_PERMISSION_CODE);
         }
+    }
+
+    private void initButtonLayoutPosition() {
+        if (!(scannerOverlay instanceof ScannerOverlayView)) {
+            return;
+        }
+
+        RectF rect = ((ScannerOverlayView) scannerOverlay).getScannerRect();
+
+        float dp = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, BUTTON_LAYOUT_DP,
+                getResources().getDisplayMetrics()
+        );
+
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) buttonLayout.getLayoutParams();
+        params.topMargin = (int)(rect.bottom + dp);
+        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+
+        buttonLayout.setLayoutParams(params);
+    }
+
+    private void initButtons() {
+        ImageButton imgBtnUpload = findViewById(R.id.image_button_upload);
+        Button btnUpload = findViewById(R.id.button_upload);
+        ImageButton imgBtnGenerate = findViewById(R.id.image_button_generate_qr);
+        Button btnGenerate = findViewById(R.id.button_generate_qr);
+        ImageButton imgBtnUseNum = findViewById(R.id.image_button_use_number);
+        Button btnUseNum = findViewById(R.id.button_use_number);
+        Button btnBack = findViewById(R.id.button_back);
+
+        imgBtnUpload.setOnClickListener(this::uploadQr);
+        btnUpload.setOnClickListener(this::uploadQr);
+        imgBtnGenerate.setOnClickListener(this::generateQr);
+        btnGenerate.setOnClickListener(this::generateQr);
+        imgBtnUseNum.setOnClickListener(this::useNumber);
+        btnUseNum.setOnClickListener(this::useNumber);
+
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void startCamera() {
@@ -93,11 +151,22 @@ public class QRScanner extends AppCompatActivity {
 
                 cameraProvider.unbindAll();
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
-
             } catch (ExecutionException | InterruptedException e) {
                 Log.e("QRScanner", "Camera initialization failed", e);
             }
 
         }, ContextCompat.getMainExecutor(this));
+    }
+
+    private void uploadQr(View v) {
+        // TODO
+    }
+
+    private void generateQr(View v) {
+        // TODO
+    }
+
+    private void useNumber(View v) {
+        // TODO
     }
 }
