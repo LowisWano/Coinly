@@ -25,7 +25,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private List<Transaction> filteredTransactions;
     private EditText searchEditText;
     private ImageButton filterButton;
-
+    private TextView balanceText;
+    private double currentBalance = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.transactionsRecyclerView);
         searchEditText = findViewById(R.id.searchEditText);
         filterButton = findViewById(R.id.filterButton);
+        balanceText = findViewById(R.id.balanceText);
         TextView transactionCount = findViewById(R.id.transactionCount);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -66,10 +68,47 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
     private void loadTransactions() {
         // TODO: Replace with actual data loading from database/API
-        allTransactions.add(new Transaction("Netflix Subscription", "January 27, 2025", -300.00));
-        allTransactions.add(new Transaction("Youtube Premium", "January 26, 2025", -239.00));
-        allTransactions.add(new Transaction("24 Chicken", "January 23, 2025", 45.00));
-        allTransactions.add(new Transaction("Burp", "January 15, 2025", 19.00));
+        allTransactions.add(new Transaction(
+            "Netflix Subscription", 
+            "January 27, 2025", 
+            -300.00,
+            "NF27012025",
+            "Your Wallet",
+            "Netflix, Inc."
+        ));
+        allTransactions.add(new Transaction(
+            "Youtube Premium", 
+            "January 26, 2025", 
+            -239.00,
+            "YT26012025",
+            "Your Wallet",
+            "Google LLC"
+        ));
+        allTransactions.add(new Transaction(
+            "24 Chicken", 
+            "January 23, 2025", 
+            45.00,
+            "24C23012025",
+            "24 Chicken",
+            "Your Wallet"
+        ));
+        allTransactions.add(new Transaction(
+            "Burp", 
+            "January 15, 2025", 
+            19.00,
+            "BP15012025",
+            "Burp App",
+            "Your Wallet"
+        ));
+
+        // Calculate current balance
+        currentBalance = 0.0;
+        for (Transaction transaction : allTransactions) {
+            currentBalance += transaction.getAmount();
+        }
+
+        // Update balance display - show 0 if negative
+        balanceText.setText(String.format("₱ %.2f", Math.max(0, currentBalance)));
 
         filteredTransactions.addAll(allTransactions);
         adapter.notifyDataSetChanged();

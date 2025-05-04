@@ -44,6 +44,7 @@ public class TransactionDetailsActivity extends AppCompatActivity {
         TextView receiverText = findViewById(R.id.receiverText);
         TextView referenceText = findViewById(R.id.referenceText);
 
+        // Show actual amount including negative values
         String formattedAmount = (amount >= 0 ? "+ " : "- ") + "Php " + String.format("%.2f", Math.abs(amount));
         amountText.setText(formattedAmount);
         amountText.setTextColor(amount >= 0 ? 0xFF4CAF50 : 0xFFE91E63);
