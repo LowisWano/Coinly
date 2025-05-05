@@ -1,5 +1,6 @@
 package com.example.coinly;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -51,42 +52,14 @@ public class MainActivity extends AppCompatActivity {
         openWalletButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Opening wallet details", Toast.LENGTH_SHORT).show();
-                // Future implementation: Navigate to wallet details screen
+                // Navigate to wallet activity
+                Intent intent = new Intent(MainActivity.this, WalletActivity.class);
+                startActivity(intent);
             }
         });
         
-        // Set up click listeners for feature buttons
-        setupFeatureButtonListeners();
-        
         // Set up click listeners for bottom navigation
         setupBottomNavListeners();
-    }
-    
-    private void setupFeatureButtonListeners() {
-        // Find all feature button container views
-        View streakButton = findViewById(R.id.streakButton);
-        View redeemButton = findViewById(R.id.redeemButton);
-        View leaderboardButton = findViewById(R.id.leaderboardButton);
-        
-        // Add click listeners to each feature button
-        if (streakButton != null) {
-            streakButton.setOnClickListener(v -> {
-                Toast.makeText(this, "Streak feature coming soon", Toast.LENGTH_SHORT).show();
-            });
-        }
-        
-        if (redeemButton != null) {
-            redeemButton.setOnClickListener(v -> {
-                Toast.makeText(this, "Redeem feature coming soon", Toast.LENGTH_SHORT).show();
-            });
-        }
-        
-        if (leaderboardButton != null) {
-            leaderboardButton.setOnClickListener(v -> {
-                Toast.makeText(this, "Leaderboard feature coming soon", Toast.LENGTH_SHORT).show();
-            });
-        }
     }
     
     private void setupBottomNavListeners() {
@@ -106,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
         
         if (walletNav != null) {
             walletNav.setOnClickListener(v -> {
-                Toast.makeText(this, "Wallet screen coming soon", Toast.LENGTH_SHORT).show();
+                // Navigate to wallet activity
+                Intent intent = new Intent(MainActivity.this, WalletActivity.class);
+                startActivity(intent);
             });
         }
         
@@ -118,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
         
         if (transactionsNav != null) {
             transactionsNav.setOnClickListener(v -> {
-                Toast.makeText(this, "Transactions screen coming soon", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, TransactionHistoryActivity.class);
+                startActivity(intent);
             });
         }
         

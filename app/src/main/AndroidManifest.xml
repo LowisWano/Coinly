@@ -36,6 +36,9 @@
         <activity
             android:name=".TransactionHistoryActivity"
             android:exported="false"/>
+        <activity
+            android:name=".WalletActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

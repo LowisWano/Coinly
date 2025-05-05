@@ -151,7 +151,9 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         });
 
         walletButton.setOnClickListener(v -> {
-            // TODO: Navigate to Wallet screen
+            // Navigate to Wallet screen
+            startActivity(new Intent(this, WalletActivity.class));
+            finish();
         });
 
         qrButton.setOnClickListener(v -> {
