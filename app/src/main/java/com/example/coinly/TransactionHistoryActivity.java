@@ -47,7 +47,6 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         searchEditText = findViewById(R.id.searchEditText);
         filterButton = findViewById(R.id.filterButton);
         balanceText = findViewById(R.id.balanceText);
-        TextView transactionCount = findViewById(R.id.transactionCount);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         allTransactions = new ArrayList<>();
@@ -55,7 +54,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         adapter = new TransactionAdapter(filteredTransactions);
         recyclerView.setAdapter(adapter);
 
-        findViewById(R.id.viewAllTransactions).setOnClickListener(v -> {
+        findViewById(R.id.viewAllButton).setOnClickListener(v -> {
             Intent intent = new Intent(this, RequestTransactionHistoryActivity.class);
             startActivity(intent);
         });
