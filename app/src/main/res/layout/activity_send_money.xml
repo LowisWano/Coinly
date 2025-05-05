@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SendMoneyActivity"
+    android:orientation="vertical"
+    android:background="#002033">
+
+    <include
+        android:id="@+id/logoHeader"
+        layout="@layout/layout_logo_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="8dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/backArrow"
+            android:src="@drawable/ic_back_arrow" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Send Money"
+            android:textColor="#FAD565"
+            android:textSize="18sp"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- Profile Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="20dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:background="@drawable/card_rounded"
+            android:padding="8dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+
+                android:scaleType="centerCrop"
+                android:background="@drawable/circle_background" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="John Doe"
+                    android:id="@+id/username"
+                    android:textColor="#F4F2C9"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1234 567 8910"
+                        android:id="@+id/usercode"
+                        android:textColor="#F4F2C9"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=" - Coinly Wallet"
+                        android:textColor="#F4F2C9"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/rightArrowButton"
+                android:src="@drawable/ic_right_arrow"
+        </LinearLayout>
+
+        <!-- Input Fields -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Number"
+            android:textColor="#F4F2C9"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="8dp"/>
+
+        <EditText
+            android:id="@+id/editTextNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:textColor="#F4F2C9"
+            android:textColorHint="#B0BEC5"
+            android:hint="Enter Number"
+            android:background="@android:color/transparent"
+            android:paddingVertical="8dp"
+            android:layout_marginLeft="8dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F4F2C9" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Amount"
+            android:textColor="#F4F2C9"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="8dp"/>
+
+        <EditText
+            android:id="@+id/editTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="#F4F2C9"
+            android:textColorHint="#B0BEC5"
+            android:hint="Enter Amount"
+            android:background="@android:color/transparent"
+            android:paddingVertical="8dp"
+            android:layout_marginLeft="8dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F4F2C9" />
+    </LinearLayout>
+
+    <include
+        android:id="@+id/bottomNavigation"
+        layout="@layout/layout_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="bottom"/>
+
+</LinearLayout>
