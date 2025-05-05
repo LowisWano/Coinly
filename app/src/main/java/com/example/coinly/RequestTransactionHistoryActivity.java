@@ -119,6 +119,26 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         DatePickerDialog dialog = new DatePickerDialog(
             this,
             (view, year, month, dayOfMonth) -> {
+                Calendar selectedDate = Calendar.getInstance();
+                selectedDate.set(year, month, dayOfMonth);
+                
+                // Don't allow future dates
+                Calendar today = Calendar.getInstance();
+                if (selectedDate.after(today)) {
+                    return;
+                }
+                
+                // For "to" date, don't allow dates before "from" date
+                if (dateText == toDateText && selectedDate.before(fromDate)) {
+                    return;
+                }
+                
+                // For "from" date, don't allow dates after "to" date
+                if (dateText == fromDateText && selectedDate.after(toDate)) {
+                    toDate.setTime(selectedDate.getTime());
+                    toDateText.setText(dateFormat.format(toDate.getTime()));
+                }
+                
                 date.set(year, month, dayOfMonth);
                 dateText.setText(dateFormat.format(date.getTime()));
             },
@@ -126,6 +146,10 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
             date.get(Calendar.MONTH),
             date.get(Calendar.DAY_OF_MONTH)
         );
+        
+        // Set the maximum date to today
+        dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        
         dialog.show();
     }
 
