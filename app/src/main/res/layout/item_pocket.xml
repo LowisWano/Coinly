@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="180dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="#052B3D"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/pocketIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_home"
+                android:background="@drawable/circle_background"
+                android:padding="8dp"
+                android:contentDescription="Pocket icon" />
+
+            <TextView
+                android:id="@+id/pocketName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Home"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical" />
+
+            <ImageView
+                android:id="@+id/pocketLockIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_lock"
+                android:layout_gravity="center_vertical"
+                android:contentDescription="Locked"
+                android:visibility="visible"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Target"
+            android:textSize="12sp"
+            android:textColor="#AAAAAA"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:id="@+id/pocketTarget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Php 50,000.00"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="4dp" />
+
+        <ProgressBar
+            android:id="@+id/pocketProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="12dp"
+            android:progress="86"
+            android:progressDrawable="@drawable/progress_drawable" />
+
+        <TextView
+            android:id="@+id/pocketProgressPercent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="86%"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="end"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

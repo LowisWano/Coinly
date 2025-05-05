@@ -19,6 +19,12 @@
             android:name=".QRScanner"
             android:exported="true" />
         <activity
+            android:name=".RequestTransactionHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransactionDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
@@ -32,21 +38,19 @@
             android:exported="false" />
         <activity
             android:name=".CreatePinActivity"
-            android:exported="false">
-
-        </activity>
+            android:exported="false" />
         <activity
             android:name=".ConfirmPinActivity"
-            android:exported="false">
-
-        </activity>
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".TransactionHistoryActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
+        <activity
+            android:name=".WalletActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
