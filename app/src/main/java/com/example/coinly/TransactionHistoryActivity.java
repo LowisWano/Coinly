@@ -33,7 +33,6 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recent_transaction);
 
-        setupToolbar();
         setupViews();
         loadTransactions();
         setupSearch();
@@ -41,11 +40,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         setupBottomNavigation();
     }
 
-    private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-    }
+
 
     private void setupViews() {
         recyclerView = findViewById(R.id.transactionsRecyclerView);
