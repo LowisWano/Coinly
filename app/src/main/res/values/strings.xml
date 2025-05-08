@@ -14,7 +14,7 @@
     <string name="invalid_email">Please enter a valid email address</string>
     <string name="invalid_password">Password must be at least 6 characters</string>
     <string name="login_success">Login successful</string>
-    
+
     <!-- Register page strings -->
     <string name="register_to_coinly">Register to Coinly</string>
     <string name="full_name">Full Name</string>
@@ -29,7 +29,7 @@
     <string name="password">Password</string>
     <string name="register">Register</string>
     <string name="registration_success">Registration Successful</string>
-    
+
     <!-- PIN screens strings -->
     <string name="create_pin">Create PIN</string>
     <string name="confirm_pin">Confirm PIN</string>
@@ -41,7 +41,13 @@
     <string name="confirm">Confirm</string>
     <string name="backspace">Delete</string>
     <string name="fingerprint">Fingerprint</string>
-    
+
     <!-- Login screen strings -->
     <string name="login_to_account">Login to your account</string>
+
+    <!-- QR Scanner screen strings-->
+    <string name="back">Back</string>
+    <string name="upload_qr">Upload QR</string>
+    <string name="generate_qr">Generate QR</string>
+    <string name="use_number">Use Number</string>
 </resources>
