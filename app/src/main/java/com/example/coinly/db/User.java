@@ -1,9 +1,6 @@
 package com.example.coinly.db;
 
-import android.content.Context;
-
 import java.util.Date;
-import java.util.HashMap;
 
 public class User {
     public static class Credentials {
