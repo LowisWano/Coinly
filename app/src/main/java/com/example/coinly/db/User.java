@@ -138,7 +138,7 @@ public class User {
                         "fullName", Map.of(
                                 "first", details.fullName.first,
                                 "last", details.fullName.last,
-                                "middleInitial", details.fullName.middleInitial
+                                "middleInitial", Character.toString(details.fullName.middleInitial)
                         ),
                         "birthdate", details.birthdate
                 )
