@@ -16,7 +16,6 @@ public class User {
             char middleInitial;
         }
 
-        String email;
         FullName fullName;
         Date birthdate;
     }
