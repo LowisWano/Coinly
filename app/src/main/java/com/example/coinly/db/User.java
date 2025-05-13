@@ -10,6 +10,21 @@ public class User {
         String email;
         String password;
         char[] pin = new char[4];
+
+        public Credentials withEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Credentials withPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Credentials withPin(char[] pin) {
+            this.pin = pin;
+            return this;
+        }
     }
 
     public static class Details {
@@ -17,10 +32,35 @@ public class User {
             String first;
             String last;
             char middleInitial;
+
+            public FullName withFirst(String first) {
+                this.first = first;
+                return this;
+            }
+
+            public FullName withLast(String last) {
+                this.last = last;
+                return this;
+            }
+
+            public FullName withMiddleInitial(char middleInitial) {
+                this.middleInitial = middleInitial;
+                return this;
+            }
         }
 
         FullName fullName;
         Date birthdate;
+
+        public Details withFullName(FullName fullName) {
+            this.fullName = fullName;
+            return this;
+        }
+
+        public Details withBirthdate(Date birthdate) {
+            this.birthdate = birthdate;
+            return this;
+        }
     }
 
     public static class Address {
@@ -28,16 +68,56 @@ public class User {
         String barangay;
         String city;
         String zipCode;
+
+        public Address withStreet(String street) {
+            this.street = street;
+            return this;
+        }
+
+        public Address withBarangay(String barangay) {
+            this.barangay = barangay;
+            return this;
+        }
+
+        public Address withCity(String city) {
+            this.city = city;
+            return this;
+        }
+
+        public Address withZipCode(String zipCode) {
+            this.zipCode = zipCode;
+            return this;
+        }
     }
 
     public static class Wallet {
         float balance;
+
+        public Wallet withBalance(float balance) {
+            this.balance = balance;
+            return this;
+        }
     }
 
     public static class Savings {
         String name;
         float target;
         float balance;
+        
+        public Savings withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Savings withTarget(float target) {
+            this.target = target;
+            return this;
+        }
+
+        public Savings withBalance(float balance) {
+            this.balance = balance;
+            return this;
+        }
     }
 
     public static void signUp(Credentials credentials, Database.ID callback) {
