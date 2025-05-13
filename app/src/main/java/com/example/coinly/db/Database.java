@@ -6,4 +6,9 @@ public class Database {
     public static FirebaseFirestore db() {
         return FirebaseFirestore.getInstance();
     }
+
+    public interface ID {
+        void onSuccess(String id);
+        void onFailure(Exception e);
+    }
 }
