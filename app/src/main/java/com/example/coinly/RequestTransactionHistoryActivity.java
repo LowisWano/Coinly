@@ -77,26 +77,28 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
                 switch (position) {
                     case 1: // Last 7 days
                         setDateRange(7);
+                        disableDatePickers();
                         break;
                     case 2: // Last 30 days
                         setDateRange(30);
+                        disableDatePickers();
                         break;
                     case 3: // Last 90 days
                         setDateRange(90);
+                        disableDatePickers();
                         break;
                     case 4: // Custom range
-                        // Reset dates to current date for custom range
-                        fromDate = Calendar.getInstance();
-                        toDate = Calendar.getInstance();
-                        fromDateText.setText(dateFormat.format(fromDate.getTime()));
-                        toDateText.setText(dateFormat.format(toDate.getTime()));
+                        enableDatePickers();
+                        break;
+                    default:
+                        disableDatePickers();
                         break;
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
+                disableDatePickers();
             }
         });
     }
@@ -108,6 +110,20 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         
         fromDateText.setText(dateFormat.format(fromDate.getTime()));
         toDateText.setText(dateFormat.format(toDate.getTime()));
+    }
+
+    private void enableDatePickers() {
+        fromDateText.setEnabled(true);
+        toDateText.setEnabled(true);
+        fromDateText.setAlpha(1.0f);
+        toDateText.setAlpha(1.0f);
+    }
+
+    private void disableDatePickers() {
+        fromDateText.setEnabled(false);
+        toDateText.setEnabled(false);
+        fromDateText.setAlpha(0.5f);
+        toDateText.setAlpha(0.5f);
     }
 
     private void setupDatePickers() {
@@ -149,6 +165,11 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         
         // Set the maximum date to today
         dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        
+        // Only set minimum date for "to" date picker
+        if (dateText == toDateText) {
+            dialog.getDatePicker().setMinDate(fromDate.getTimeInMillis());
+        }
         
         dialog.show();
     }
