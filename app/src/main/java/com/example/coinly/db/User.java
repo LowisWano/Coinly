@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class User {
     public static class Credentials {
-        String phoneNumber;
-        String passwordHash;
+        String email;
+        String password;
         char[] pin = new char[4];
     }
 
