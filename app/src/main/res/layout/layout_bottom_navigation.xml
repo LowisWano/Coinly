@@ -81,15 +81,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
-            <ImageButton
+            <ImageView
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:background="@drawable/bg_qr_button"
                 android:contentDescription="Scan QR"
-                android:elevation="4dp"
-                android:padding="16dp"
+                android:padding="6dp"
                 android:src="@drawable/ic_qr_code" />
         </LinearLayout>
 
