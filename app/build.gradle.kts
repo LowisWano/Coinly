@@ -49,4 +49,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
 }
