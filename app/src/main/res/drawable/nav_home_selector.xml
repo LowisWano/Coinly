@@ -19,8 +19,7 @@
                     <solid android:color="#00FFFFFF"/>
                 </shape>
             </item>
-            <item android:drawable="@drawable/ic_home" 
-                  android:alpha="0.7"/>
+            <item android:drawable="@drawable/ic_home" />
         </layer-list>
     </item>
 </selector>
