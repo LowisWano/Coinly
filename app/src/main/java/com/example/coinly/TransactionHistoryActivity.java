@@ -189,7 +189,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         LinearLayout profileButton = findViewById(R.id.profileButton);
 
         homeButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, WalletActivity.class));
             finish();
         });
 

@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
                 
                 // Navigate to main activity
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, WalletActivity.class);
                 startActivity(intent);
                 finish(); // Close login activity
             }
