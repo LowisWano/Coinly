@@ -4,12 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,13 +25,14 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private List<Transaction> filteredTransactions;
     private EditText searchEditText;
     private ImageButton filterButton;
+    private TextView balanceText;
+    private double currentBalance = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction_history);
 
-        setupToolbar();
         setupViews();
         loadTransactions();
         setupSearch();
@@ -39,33 +40,76 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         setupBottomNavigation();
     }
 
-    private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-    }
+
 
     private void setupViews() {
         recyclerView = findViewById(R.id.transactionsRecyclerView);
         searchEditText = findViewById(R.id.searchEditText);
         filterButton = findViewById(R.id.filterButton);
-        
+        balanceText = findViewById(R.id.balanceText);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         allTransactions = new ArrayList<>();
         filteredTransactions = new ArrayList<>();
         adapter = new TransactionAdapter(filteredTransactions);
         recyclerView.setAdapter(adapter);
+
+        findViewById(R.id.viewAllButton).setOnClickListener(v -> {
+            Intent intent = new Intent(this, RequestTransactionHistoryActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loadTransactions() {
         // TODO: Replace with actual data loading from database/API
-        allTransactions.add(new Transaction("Netflix Subscription", "January 27, 2025", -300.00));
-        allTransactions.add(new Transaction("Youtube Premium", "January 26, 2025", -239.00));
-        allTransactions.add(new Transaction("24 Chicken", "January 23, 2025", 45.00));
-        allTransactions.add(new Transaction("Burp", "January 15, 2025", 19.00));
-        
+        allTransactions.add(new Transaction(
+                "Netflix Subscription",
+                "January 27, 2025",
+                -300.00,
+                "NF27012025",
+                "Your Wallet",
+                "Netflix, Inc."
+        ));
+        allTransactions.add(new Transaction(
+                "Youtube Premium",
+                "January 26, 2025",
+                -239.00,
+                "YT26012025",
+                "Your Wallet",
+                "Google LLC"
+        ));
+        allTransactions.add(new Transaction(
+                "24 Chicken",
+                "January 23, 2025",
+                45.00,
+                "24C23012025",
+                "24 Chicken",
+                "Your Wallet"
+        ));
+        allTransactions.add(new Transaction(
+                "Burp",
+                "January 15, 2025",
+                19.00,
+                "BP15012025",
+                "Burp App",
+                "Your Wallet"
+        ));
+
+        // Calculate current balance
+        currentBalance = 0.0;
+        for (Transaction transaction : allTransactions) {
+            currentBalance += transaction.getAmount();
+        }
+
+        // Update balance display - show 0 if negative
+        balanceText.setText(String.format("₱ %.2f", Math.max(0, currentBalance)));
+
         filteredTransactions.addAll(allTransactions);
         adapter.notifyDataSetChanged();
+
+        // Update the transaction count text
+        TextView transactionCount = findViewById(R.id.transactionCount);
+        transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
     }
 
     private void setupSearch() {
@@ -90,8 +134,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private void showFilterDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(R.layout.dialog_filter_transactions);
-        
-        // Setup filter options (All, Income, Expenses)
+
         dialog.findViewById(R.id.filterAll).setOnClickListener(v -> {
             filteredTransactions.clear();
             filteredTransactions.addAll(allTransactions);
@@ -99,13 +142,13 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        dialog.findViewById(R.id.filterIncome).setOnClickListener(v -> {
-            filterByType(true);
+        dialog.findViewById(R.id.filterDeposit).setOnClickListener(v -> {
+            filterByType(true); // true for coins added
             dialog.dismiss();
         });
 
         dialog.findViewById(R.id.filterExpenses).setOnClickListener(v -> {
-            filterByType(false);
+            filterByType(false); // false for coins spent
             dialog.dismiss();
         });
 
@@ -119,7 +162,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         } else {
             for (Transaction transaction : allTransactions) {
                 if (transaction.getTitle().toLowerCase().contains(query.toLowerCase()) ||
-                    transaction.getDate().toLowerCase().contains(query.toLowerCase())) {
+                        transaction.getDate().toLowerCase().contains(query.toLowerCase())) {
                     filteredTransactions.add(transaction);
                 }
             }
@@ -127,11 +170,11 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    private void filterByType(boolean isIncome) {
+    private void filterByType(boolean isCoinsAdded) {
         filteredTransactions.clear();
         for (Transaction transaction : allTransactions) {
-            if ((isIncome && transaction.getAmount() > 0) ||
-                (!isIncome && transaction.getAmount() < 0)) {
+            if ((isCoinsAdded && transaction.getAmount() > 0) ||
+                    (!isCoinsAdded && transaction.getAmount() < 0)) {
                 filteredTransactions.add(transaction);
             }
         }
@@ -146,7 +189,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         LinearLayout profileButton = findViewById(R.id.profileButton);
 
         homeButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, WalletActivity.class));
             finish();
         });
 

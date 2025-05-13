@@ -114,7 +114,8 @@ public class ConfirmPinActivity extends AppCompatActivity {
 
     private void setupConfirmButton() {
         btnConfirm.setOnClickListener(v -> {
-            if (originalPin.equals(pinBuilder.toString())) {
+            // Add null check to prevent NullPointerException
+            if (originalPin != null && originalPin.equals(pinBuilder.toString())) {
                 // PINs match
                 Toast.makeText(this, R.string.pin_success, Toast.LENGTH_SHORT).show();
                 
