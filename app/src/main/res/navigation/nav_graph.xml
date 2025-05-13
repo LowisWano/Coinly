@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/home_fragment">
+
+    <fragment
+        android:id="@+id/home_fragment"
+        android:name="com.example.coinly.Fragments$HomeFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/pocket_fragment"
+        android:name="com.example.coinly.Fragments$PocketFragment"
+        android:label="Pocket" />
+
+    <fragment
+        android:id="@+id/qrscanner_fragment"
+        android:name="com.example.coinly.Fragments$QRScanner"
+        android:label="Scanner" />
+
+    <fragment
+        android:id="@+id/transactions_fragment"
+        android:name="com.example.coinly.Fragments$TransactionsFragment"
+        android:label="Transactions" />
+
+    <fragment
+        android:id="@+id/profile_fragment"
+        android:name="com.example.coinly.Fragments$ProfileFragment"
+        android:label="Profile" />
+</navigation>
