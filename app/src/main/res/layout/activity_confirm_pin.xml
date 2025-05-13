@@ -7,31 +7,6 @@
     android:background="#F4F2C9"
     tools:context=".ConfirmPinActivity">
 
-    <!-- Logo at the top -->
-    <ImageView
-        android:id="@+id/ivLogo"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="60dp"
-        android:contentDescription="@string/app_logo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/coinlylogo2" />
-
-    <!-- Confirm PIN Title -->
-    <TextView
-        android:id="@+id/tvConfirmPinTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/confirm_pin"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
-
     <!-- Card View for the PIN confirmation form - full width with rounded top corners only -->
     <androidx.cardview.widget.CardView
         android:id="@+id/confirmPinCardView"
@@ -43,8 +18,7 @@
         app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvConfirmPinTitle">
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,7 +26,7 @@
             android:orientation="vertical"
             android:padding="24dp"
             android:gravity="center_horizontal"
-            android:background="@drawable/card_top_rounded">
+            android:background="@drawable/card_top_rounded_corners_only">
 
             <!-- PIN Description -->
             <TextView

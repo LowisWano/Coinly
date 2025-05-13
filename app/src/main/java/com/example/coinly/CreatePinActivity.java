@@ -129,7 +129,6 @@ public class CreatePinActivity extends AppCompatActivity {
         
         // Stagger animations with delays
         int delay = 100;
-        animateViewWithDelay(findViewById(R.id.tvCreatePinTitle), slideUp, delay);
         animateViewWithDelay(findViewById(R.id.tvPinDescription), slideUp, delay * 2);
         animateViewWithDelay(findViewById(R.id.pinDisplay), slideUp, delay * 3);
         animateViewWithDelay(findViewById(R.id.keypad), slideUp, delay * 4);
