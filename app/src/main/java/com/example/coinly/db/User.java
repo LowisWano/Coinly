@@ -2,7 +2,7 @@ package com.example.coinly.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 public class User {
@@ -51,7 +51,7 @@ public class User {
 
         String phoneNumber;
         FullName fullName;
-        Date birthdate;
+        GregorianCalendar birthdate;
 
         public Details withPhoneNumber(String phoneNumber) {
             this.phoneNumber = phoneNumber;
@@ -63,7 +63,7 @@ public class User {
             return this;
         }
 
-        public Details withBirthdate(Date birthdate) {
+        public Details withBirthdate(GregorianCalendar birthdate) {
             this.birthdate = birthdate;
             return this;
         }
@@ -109,7 +109,7 @@ public class User {
         String name;
         float target;
         float balance;
-        
+
         public Savings withName(String name) {
             this.name = name;
             return this;
