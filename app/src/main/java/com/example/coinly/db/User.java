@@ -49,8 +49,14 @@ public class User {
             }
         }
 
+        String phoneNumber;
         FullName fullName;
         Date birthdate;
+
+        public Details withPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
 
         public Details withFullName(FullName fullName) {
             this.fullName = fullName;
@@ -120,17 +126,28 @@ public class User {
         }
     }
 
-    public static void signUp(Credentials credentials, Database.ID callback) {
+    public static void signUp(Credentials credentials, Details details, Database.ID callback) {
         Map<String, Object> user = Map.of(
-                "email", credentials.email,
-                "password", credentials.password, // TODO: Encrypt the password
-                "pin", credentials.pin
+                "credentials", Map.of(
+                        "email", credentials.email,
+                        "password", credentials.password, // TODO: Encrypt the password
+                        "pin", credentials.pin
+                ),
+                "details", Map.of(
+                        "phoneNumber", details.phoneNumber,
+                        "fullName", Map.of(
+                                "first", details.fullName.first,
+                                "last", details.fullName.last,
+                                "middleInitial", details.fullName.middleInitial
+                        ),
+                        "birthdate", details.birthdate
+                )
         );
 
         FirebaseFirestore db = Database.db();
 
         db.collection("users")
-                .whereEqualTo("email", credentials.email)
+                .whereEqualTo("credentials.email", credentials.email)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
@@ -148,8 +165,8 @@ public class User {
 
     public static void login(Credentials credentials, Database.ID callback) {
         Database.db().collection("users")
-                .whereEqualTo("email", credentials.email)
-                .whereEqualTo("password", credentials.password) // TODO: Change to use decryption
+                .whereEqualTo("credentials.email", credentials.email)
+                .whereEqualTo("credentials.password", credentials.password) // TODO: Change to use decryption
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
