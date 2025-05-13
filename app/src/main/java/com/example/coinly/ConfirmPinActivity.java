@@ -120,7 +120,7 @@ public class ConfirmPinActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.pin_success, Toast.LENGTH_SHORT).show();
                 
                 new Handler().postDelayed(() -> {
-                    Intent intent = new Intent(ConfirmPinActivity.this, WalletActivity.class);
+                    Intent intent = new Intent(ConfirmPinActivity.this, WalletFragment.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     

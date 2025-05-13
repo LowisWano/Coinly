@@ -4,21 +4,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionHistoryActivity extends AppCompatActivity {
+public class TransactionHistoryFragment extends Fragment {
     private RecyclerView recyclerView;
     private TransactionAdapter adapter;
     private List<Transaction> allTransactions;
@@ -28,39 +30,42 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private TextView balanceText;
     private double currentBalance = 0.0;
 
+    @NonNull
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transaction_history);
-
-        setupViews();
-        loadTransactions();
-        setupSearch();
-        setupFilter();
-        setupBottomNavigation();
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_transaction_history, container, false);
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        setupViews(view);
+        loadTransactions(view);
+        setupSearch();
+        setupFilter();
+    }
 
-    private void setupViews() {
-        recyclerView = findViewById(R.id.transactionsRecyclerView);
-        searchEditText = findViewById(R.id.searchEditText);
-        filterButton = findViewById(R.id.filterButton);
-        balanceText = findViewById(R.id.balanceText);
+    private void setupViews(@NonNull View view) {
+        recyclerView = view.findViewById(R.id.transactionsRecyclerView);
+        searchEditText = view.findViewById(R.id.searchEditText);
+        filterButton = view.findViewById(R.id.filterButton);
+        balanceText = view.findViewById(R.id.balanceText);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         allTransactions = new ArrayList<>();
         filteredTransactions = new ArrayList<>();
         adapter = new TransactionAdapter(filteredTransactions);
         recyclerView.setAdapter(adapter);
 
-        findViewById(R.id.viewAllButton).setOnClickListener(v -> {
-            Intent intent = new Intent(this, RequestTransactionHistoryActivity.class);
+        view.findViewById(R.id.viewAllButton).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), RequestTransactionHistoryActivity.class);
             startActivity(intent);
         });
     }
 
-    private void loadTransactions() {
+    private void loadTransactions(@NonNull View view) {
         // TODO: Replace with actual data loading from database/API
         allTransactions = new ArrayList<>();
         allTransactions.add(new Transaction(
@@ -111,7 +116,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         
         // Update the transaction count text
-        TextView transactionCount = findViewById(R.id.transactionCount);
+        TextView transactionCount = view.findViewById(R.id.transactionCount);
         transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
     }
 
@@ -135,7 +140,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     }
 
     private void showFilterDialog() {
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         dialog.setContentView(R.layout.dialog_filter_transactions);
 
         dialog.findViewById(R.id.filterAll).setOnClickListener(v -> {
@@ -182,43 +187,5 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             }
         }
         adapter.notifyDataSetChanged();
-    }
-
-    private void setupBottomNavigation() {
-        LinearLayout homeButton = findViewById(R.id.homeButton);
-        LinearLayout walletButton = findViewById(R.id.walletButton);
-        LinearLayout qrButton = findViewById(R.id.qrButton);
-        LinearLayout transactionsButton = findViewById(R.id.transactionsButton);
-        LinearLayout profileButton = findViewById(R.id.profileButton);
-
-        homeButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, WalletActivity.class));
-            finish();
-        });
-
-        walletButton.setOnClickListener(v -> {
-            // TODO: Navigate to Wallet screen
-        });
-
-        qrButton.setOnClickListener(v -> {
-            // TODO: Open QR scanner
-        });
-
-        // Mark transactions button as selected
-        transactionsButton.setSelected(true);
-
-        profileButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
-            finish();
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

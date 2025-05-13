@@ -5,26 +5,26 @@
 
     <fragment
         android:id="@+id/home_fragment"
-        android:name="com.example.coinly.Fragments$HomeFragment"
+        android:name="com.example.coinly.WalletFragment"
         android:label="Home" />
 
     <fragment
         android:id="@+id/pocket_fragment"
-        android:name="com.example.coinly.Fragments$PocketFragment"
+        android:name="com.example.coinly.WalletFragment"
         android:label="Pocket" />
 
     <fragment
         android:id="@+id/qrscanner_fragment"
-        android:name="com.example.coinly.Fragments$QRScanner"
+        android:name="com.example.coinly.QRScannerFragment"
         android:label="Scanner" />
 
     <fragment
         android:id="@+id/transactions_fragment"
-        android:name="com.example.coinly.Fragments$TransactionsFragment"
+        android:name="com.example.coinly.TransactionHistoryFragment"
         android:label="Transactions" />
 
     <fragment
         android:id="@+id/profile_fragment"
-        android:name="com.example.coinly.Fragments$ProfileFragment"
+        android:name="com.example.coinly.ProfileFragment"
         android:label="Profile" />
 </navigation>

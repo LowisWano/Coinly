@@ -3,20 +3,23 @@ package com.example.coinly;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WalletActivity extends AppCompatActivity {
+public class WalletFragment extends Fragment {
 
     private static final String TAG = "WalletActivity";
     
@@ -32,34 +35,39 @@ public class WalletActivity extends AppCompatActivity {
     private String actualBalance = "Php 1,242.69";
     private String hiddenBalance = "Php ••••••";
 
+    @NonNull
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wallet);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_wallet, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         try {
-            initViews();
+            initViews(view);
             setupHideBalanceButton();
             loadPocketData();
             loadTransactionData();
             setupPocketsRecyclerView();
             setupTransactionsRecyclerView();
-            setupBottomNavigation();
-            setupSeeAllButtons();
+            setupSeeAllButtons(view);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing wallet activity", e);
-            Toast.makeText(this, "Error opening wallet: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "Error opening wallet: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void initViews() {
-        pocketsRecyclerView = findViewById(R.id.pocketsRecyclerView);
-        transactionsRecyclerView = findViewById(R.id.transactionsRecyclerView);
-        balanceAmount = findViewById(R.id.balanceAmount);
-        hideBalanceButton = findViewById(R.id.hideBalanceButton);
+    private void initViews(@NonNull View view) {
+        pocketsRecyclerView = view.findViewById(R.id.pocketsRecyclerView);
+        transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView);
+        balanceAmount = view.findViewById(R.id.balanceAmount);
+        hideBalanceButton = view.findViewById(R.id.hideBalanceButton);
 
         // Set user name dynamically (would come from user profile in a real app)
-        TextView userNameTextView = findViewById(R.id.userName);
+        TextView userNameTextView = view.findViewById(R.id.userName);
         userNameTextView.setText("John Doe");
         
         // Set initial balance
@@ -94,12 +102,12 @@ public class WalletActivity extends AppCompatActivity {
 
     private void setupPocketsRecyclerView() {
         if (pocketsRecyclerView != null) {
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
             pocketsRecyclerView.setLayoutManager(layoutManager);
             
             pocketAdapter = new PocketAdapter(pocketsList, (pocket, position) -> {
                 // Handle pocket item click
-                Toast.makeText(this, pocket.getName() + " pocket clicked", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), pocket.getName() + " pocket clicked", Toast.LENGTH_SHORT).show();
                 // Navigate to pocket details in a real app
             });
             
@@ -109,7 +117,7 @@ public class WalletActivity extends AppCompatActivity {
 
     private void setupTransactionsRecyclerView() {
         if (transactionsRecyclerView != null) {
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
             transactionsRecyclerView.setLayoutManager(layoutManager);
             
             transactionAdapter = new TransactionAdapter(transactionsList);
@@ -120,48 +128,19 @@ public class WalletActivity extends AppCompatActivity {
         }
     }
 
-    private void setupBottomNavigation() {
-        LinearLayout homeButton = findViewById(R.id.homeButton);
-        LinearLayout walletButton = findViewById(R.id.walletButton);
-        LinearLayout qrButton = findViewById(R.id.qrButton);
-        LinearLayout transactionsButton = findViewById(R.id.transactionsButton);
-        LinearLayout profileButton = findViewById(R.id.profileButton);
-
-        transactionsButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, TransactionHistoryActivity.class));
-            finish();
-        });
-
-        walletButton.setOnClickListener(v -> {
-            // TODO: Navigate to Wallet screen
-        });
-
-        qrButton.setOnClickListener(v -> {
-            // TODO: Open QR scanner
-        });
-
-        // Mark transactions button as selected
-        homeButton.setSelected(true);
-
-        profileButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
-            finish();
-        });
-    }
-    
-    private void setupSeeAllButtons() {
+    private void setupSeeAllButtons(@NonNull View view) {
         // Set up "See All" buttons
-        TextView seeAllPockets = findViewById(R.id.seeAllPockets);
+        TextView seeAllPockets = view.findViewById(R.id.seeAllPockets);
         if (seeAllPockets != null) {
             seeAllPockets.setOnClickListener(v -> {
-                Toast.makeText(this, "All Pockets coming soon", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "All Pockets coming soon", Toast.LENGTH_SHORT).show();
             });
         }
         
-        TextView seeAllTransactions = findViewById(R.id.seeAllTransactions);
+        TextView seeAllTransactions = view.findViewById(R.id.seeAllTransactions);
         if (seeAllTransactions != null) {
             seeAllTransactions.setOnClickListener(v -> {
-                Intent intent = new Intent(this, TransactionHistoryActivity.class);
+                Intent intent = new Intent(requireContext(), TransactionHistoryFragment.class);
                 startActivity(intent);
             });
         }

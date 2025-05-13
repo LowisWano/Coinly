@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".QRScanner">
+    tools:context=".QRScannerFragment">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -125,19 +125,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/button_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:layout_gravity="center_horizontal|bottom"
-            android:backgroundTint="@color/blue_soft"
-            android:paddingHorizontal="40dp"
-            android:text="@string/back"
-            android:textColor="@color/yellow_hard"
-            android:textSize="10pt"
-            tools:ignore="TextSizeCheck" />
 
     </FrameLayout>
 

@@ -6,7 +6,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class DashboardActivity extends AppCompatActivity {
                 // Open QR scanner
                 Toast.makeText(this, "QR Scanner coming soon", Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.nav_transactions) {
-                startActivity(new Intent(this, TransactionHistoryActivity.class));
+                startActivity(new Intent(this, TransactionHistoryFragment.class));
             } else if (itemId == R.id.nav_profile) {
                 Toast.makeText(this, "Profile coming soon", Toast.LENGTH_SHORT).show();
             }
@@ -62,7 +62,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Add click listener to view all transactions
         findViewById(R.id.viewAllTransactions).setOnClickListener(v -> {
-            Intent intent = new Intent(this, TransactionHistoryActivity.class);
+            Intent intent = new Intent(this, TransactionHistoryFragment.class);
             startActivity(intent);
         });
     }

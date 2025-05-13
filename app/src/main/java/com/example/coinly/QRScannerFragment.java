@@ -8,14 +8,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.Preview;
@@ -23,6 +26,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -34,7 +38,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class QRScanner extends AppCompatActivity {
+public class QRScannerFragment extends Fragment {
     private static final int CAMERA_PERMISSION_CODE = 101;
     private static final int BUTTON_LAYOUT_DP = 20;
 
@@ -46,30 +50,36 @@ public class QRScanner extends AppCompatActivity {
 
     private ExecutorService cameraExecutor;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qrscanner);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_qrscanner, container, false);
+    }
 
-        pvScanner = findViewById(R.id.preview_view_scanner);
-        scannerOverlay = findViewById(R.id.scanner_overlay_view);
-        buttonLayout = findViewById(R.id.button_layout);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        pvScanner = view.findViewById(R.id.preview_view_scanner);
+        scannerOverlay = view.findViewById(R.id.scanner_overlay_view);
+        buttonLayout = view.findViewById(R.id.button_layout);
 
         scannerOverlay.post(this::initButtonLayoutPosition);
 
         initScanner();
-        initButtons();
+        initButtons(view);
     }
 
     private void initScanner() {
         scanner = BarcodeScanning.getClient();
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             startCamera();
         } else {
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{Manifest.permission.CAMERA},
                     CAMERA_PERMISSION_CODE);
         }
@@ -94,14 +104,13 @@ public class QRScanner extends AppCompatActivity {
         buttonLayout.setLayoutParams(params);
     }
 
-    private void initButtons() {
-        ImageButton imgBtnUpload = findViewById(R.id.image_button_upload);
-        Button btnUpload = findViewById(R.id.button_upload);
-        ImageButton imgBtnGenerate = findViewById(R.id.image_button_generate_qr);
-        Button btnGenerate = findViewById(R.id.button_generate_qr);
-        ImageButton imgBtnUseNum = findViewById(R.id.image_button_use_number);
-        Button btnUseNum = findViewById(R.id.button_use_number);
-        Button btnBack = findViewById(R.id.button_back);
+    private void initButtons(@NonNull View view) {
+        ImageButton imgBtnUpload = view.findViewById(R.id.image_button_upload);
+        Button btnUpload = view.findViewById(R.id.button_upload);
+        ImageButton imgBtnGenerate = view.findViewById(R.id.image_button_generate_qr);
+        Button btnGenerate = view.findViewById(R.id.button_generate_qr);
+        ImageButton imgBtnUseNum = view.findViewById(R.id.image_button_use_number);
+        Button btnUseNum = view.findViewById(R.id.button_use_number);
 
         imgBtnUpload.setOnClickListener(this::uploadQr);
         btnUpload.setOnClickListener(this::uploadQr);
@@ -109,13 +118,11 @@ public class QRScanner extends AppCompatActivity {
         btnGenerate.setOnClickListener(this::generateQr);
         imgBtnUseNum.setOnClickListener(this::useNumber);
         btnUseNum.setOnClickListener(this::useNumber);
-
-        btnBack.setOnClickListener(v -> finish());
     }
 
     private void startCamera() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
-                ProcessCameraProvider.getInstance(this);
+                ProcessCameraProvider.getInstance(requireContext());
 
         cameraProviderFuture.addListener(() -> {
             try {
@@ -138,7 +145,7 @@ public class QRScanner extends AppCompatActivity {
                                     for (Barcode barcode : barcodes) {
                                         String value = barcode.getRawValue();
                                         if (value != null) {
-                                            runOnUiThread(() -> Toast.makeText(QRScanner.this, "QR Code: " + value, Toast.LENGTH_SHORT).show());
+                                            requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), "QR Code: " + value, Toast.LENGTH_SHORT).show());
                                         }
                                     }
                                 })
@@ -155,7 +162,7 @@ public class QRScanner extends AppCompatActivity {
                 Log.e("QRScanner", "Camera initialization failed", e);
             }
 
-        }, ContextCompat.getMainExecutor(this));
+        }, ContextCompat.getMainExecutor(requireContext()));
     }
 
     private void uploadQr(View v) {

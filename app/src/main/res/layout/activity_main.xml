@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#FAD565"
     android:orientation="vertical"
-    tools:context=".WalletActivity">
+    tools:context=".WalletFragment">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
