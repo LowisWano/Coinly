@@ -62,37 +62,38 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
     private void loadTransactions() {
         // TODO: Replace with actual data loading from database/API
+        allTransactions = new ArrayList<>();
         allTransactions.add(new Transaction(
-                "Netflix Subscription",
-                "January 27, 2025",
-                -300.00,
-                "NF27012025",
-                "Your Wallet",
-                "Netflix, Inc."
+            "Netflix Subscription", 
+            "January 27, 2025", 
+            -300.00,
+            "NF27012025",
+            "Your Wallet",
+            "Netflix, Inc."
         ));
         allTransactions.add(new Transaction(
-                "Youtube Premium",
-                "January 26, 2025",
-                -239.00,
-                "YT26012025",
-                "Your Wallet",
-                "Google LLC"
+            "Youtube Premium", 
+            "January 26, 2025", 
+            -239.00,
+            "YT26012025",
+            "Your Wallet",
+            "Google LLC"
         ));
         allTransactions.add(new Transaction(
-                "24 Chicken",
-                "January 23, 2025",
-                45.00,
-                "24C23012025",
-                "24 Chicken",
-                "Your Wallet"
+            "24 Chicken", 
+            "January 23, 2025", 
+            45.00,
+            "24C23012025",
+            "24 Chicken",
+            "Your Wallet"
         ));
         allTransactions.add(new Transaction(
-                "Burp",
-                "January 15, 2025",
-                19.00,
-                "BP15012025",
-                "Burp App",
-                "Your Wallet"
+            "Burp", 
+            "January 15, 2025", 
+            19.00,
+            "BP15012025",
+            "Burp App",
+            "Your Wallet"
         ));
 
         // Calculate current balance
@@ -101,12 +102,14 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             currentBalance += transaction.getAmount();
         }
 
-        // Update balance display - show 0 if negative
-        balanceText.setText(String.format("₱ %.2f", Math.max(0, currentBalance)));
+        // Update balance display
+        balanceText.setText(String.format("₱ %,.2f", Math.abs(currentBalance)));
 
+        // Update filtered transactions
+        filteredTransactions.clear();
         filteredTransactions.addAll(allTransactions);
         adapter.notifyDataSetChanged();
-
+        
         // Update the transaction count text
         TextView transactionCount = findViewById(R.id.transactionCount);
         transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
