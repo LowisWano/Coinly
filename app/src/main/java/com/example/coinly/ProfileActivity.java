@@ -76,9 +76,9 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         // Mark transactions button as selected
-        homeButton.setSelected(true);
+        profileButton.setSelected(true);
 
-        profileButton.setOnClickListener(v -> {
+        homeButton.setOnClickListener(v -> {
             startActivity(new Intent(this, ProfileActivity.class));
             finish();
         });
