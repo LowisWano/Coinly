@@ -27,7 +27,7 @@ public class TransactionHistoryFragment extends Fragment {
     private List<Transaction> filteredTransactions;
     private EditText searchEditText;
     private ImageButton filterButton;
-    private TextView balanceText;
+    private TextView balanceText, transactionCount;
     private double currentBalance = 0.0;
 
     @NonNull
@@ -41,17 +41,18 @@ public class TransactionHistoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupViews(view);
-        loadTransactions(view);
+        initViews(view);
+        loadTransactions();
         setupSearch();
         setupFilter();
     }
 
-    private void setupViews(@NonNull View view) {
+    private void initViews(@NonNull View view) {
         recyclerView = view.findViewById(R.id.transactionsRecyclerView);
         searchEditText = view.findViewById(R.id.searchEditText);
         filterButton = view.findViewById(R.id.filterButton);
         balanceText = view.findViewById(R.id.balanceText);
+        transactionCount = view.findViewById(R.id.transactionCount);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         allTransactions = new ArrayList<>();
@@ -65,7 +66,7 @@ public class TransactionHistoryFragment extends Fragment {
         });
     }
 
-    private void loadTransactions(@NonNull View view) {
+    private void loadTransactions() {
         // TODO: Replace with actual data loading from database/API
         allTransactions = new ArrayList<>();
         allTransactions.add(new Transaction(
@@ -116,7 +117,6 @@ public class TransactionHistoryFragment extends Fragment {
         adapter.notifyDataSetChanged();
         
         // Update the transaction count text
-        TextView transactionCount = view.findViewById(R.id.transactionCount);
         transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
     }
 

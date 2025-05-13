@@ -31,6 +31,7 @@ public class WalletFragment extends Fragment {
     private List<Transaction> transactionsList;
     private TextView balanceAmount;
     private ImageButton hideBalanceButton;
+    private TextView seeAllPockets, seeAllTransactions;
     private boolean isBalanceHidden = false;
     private String actualBalance = "Php 1,242.69";
     private String hiddenBalance = "Php ••••••";
@@ -53,7 +54,7 @@ public class WalletFragment extends Fragment {
             loadTransactionData();
             setupPocketsRecyclerView();
             setupTransactionsRecyclerView();
-            setupSeeAllButtons(view);
+            setupSeeAllButtons();
         } catch (Exception e) {
             Log.e(TAG, "Error initializing wallet activity", e);
             Toast.makeText(requireContext(), "Error opening wallet: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -65,6 +66,10 @@ public class WalletFragment extends Fragment {
         transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView);
         balanceAmount = view.findViewById(R.id.balanceAmount);
         hideBalanceButton = view.findViewById(R.id.hideBalanceButton);
+
+
+        seeAllPockets = view.findViewById(R.id.seeAllPockets);
+        seeAllTransactions = view.findViewById(R.id.seeAllTransactions);
 
         // Set user name dynamically (would come from user profile in a real app)
         TextView userNameTextView = view.findViewById(R.id.userName);
@@ -128,21 +133,14 @@ public class WalletFragment extends Fragment {
         }
     }
 
-    private void setupSeeAllButtons(@NonNull View view) {
-        // Set up "See All" buttons
-        TextView seeAllPockets = view.findViewById(R.id.seeAllPockets);
-        if (seeAllPockets != null) {
-            seeAllPockets.setOnClickListener(v -> {
-                Toast.makeText(requireContext(), "All Pockets coming soon", Toast.LENGTH_SHORT).show();
-            });
-        }
-        
-        TextView seeAllTransactions = view.findViewById(R.id.seeAllTransactions);
-        if (seeAllTransactions != null) {
-            seeAllTransactions.setOnClickListener(v -> {
-                Intent intent = new Intent(requireContext(), TransactionHistoryFragment.class);
-                startActivity(intent);
-            });
-        }
+    private void setupSeeAllButtons() {
+        seeAllPockets.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "All Pockets coming soon", Toast.LENGTH_SHORT).show();
+        });
+
+        seeAllTransactions.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), TransactionHistoryFragment.class);
+            startActivity(intent);
+        });
     }
 }
