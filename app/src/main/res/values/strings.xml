@@ -50,4 +50,15 @@
     <string name="upload_qr">Upload QR</string>
     <string name="generate_qr">Generate QR</string>
     <string name="use_number">Use Number</string>
+
+    <!-- Profile Screen strings -->
+    <string name="profile_name">John C. Doe</string>
+    <string name="profile_phone">09123456789</string>
+    <string name="birthdate_label">Birthdate</string>
+    <string name="birthdate_value">Aug 21, 2002</string>
+    <string name="email_label">Email Address</string>
+    <string name="email_value">bayotkolol@gmail.com</string>
+    <string name="address_label">Current Address</string>
+    <string name="address_value">Kilid sa Jollibee, Talamban, Cebu City, 6000</string>
+    <string name="update_account">Update Account Information</string>
 </resources>

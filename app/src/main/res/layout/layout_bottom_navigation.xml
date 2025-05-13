@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#1D2632"
+    android:background="#083248"
     android:paddingTop="12dp"
     android:paddingBottom="12dp">
 
@@ -62,12 +62,12 @@
                 android:layout_height="24dp"
                 android:src="@drawable/nav_wallet_selector"
                 android:duplicateParentState="true"
-                android:contentDescription="Wallet"/>
+                android:contentDescription="Pocket"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Wallet"
+                android:text="Pockets"
                 android:textColor="@android:color/white"
                 android:alpha="0.7"
                 android:textSize="12sp"

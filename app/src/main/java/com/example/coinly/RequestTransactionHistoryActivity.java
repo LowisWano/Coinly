@@ -26,11 +26,11 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
 
     private final String[] dateRanges = new String[]{
-            "Select date range",
-            "Last 7 days",
-            "Last 30 days",
-            "Last 90 days",
-            "Custom range"
+        "Select date range",
+        "Last 7 days",
+        "Last 30 days",
+        "Last 90 days",
+        "Custom range"
     };
 
     @Override
@@ -64,9 +64,9 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
 
     private void setupDateRangeSpinner() {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                dateRanges
+            this,
+            android.R.layout.simple_spinner_item,
+            dateRanges
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dateRangeSpinner.setAdapter(adapter);
@@ -77,26 +77,28 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
                 switch (position) {
                     case 1: // Last 7 days
                         setDateRange(7);
+                        disableDatePickers();
                         break;
                     case 2: // Last 30 days
                         setDateRange(30);
+                        disableDatePickers();
                         break;
                     case 3: // Last 90 days
                         setDateRange(90);
+                        disableDatePickers();
                         break;
                     case 4: // Custom range
-                        // Reset dates to current date for custom range
-                        fromDate = Calendar.getInstance();
-                        toDate = Calendar.getInstance();
-                        fromDateText.setText(dateFormat.format(fromDate.getTime()));
-                        toDateText.setText(dateFormat.format(toDate.getTime()));
+                        enableDatePickers();
+                        break;
+                    default:
+                        disableDatePickers();
                         break;
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
+                disableDatePickers();
             }
         });
     }
@@ -105,9 +107,23 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         toDate = Calendar.getInstance();
         fromDate = Calendar.getInstance();
         fromDate.add(Calendar.DAY_OF_MONTH, -days);
-
+        
         fromDateText.setText(dateFormat.format(fromDate.getTime()));
         toDateText.setText(dateFormat.format(toDate.getTime()));
+    }
+
+    private void enableDatePickers() {
+        fromDateText.setEnabled(true);
+        toDateText.setEnabled(true);
+        fromDateText.setAlpha(1.0f);
+        toDateText.setAlpha(1.0f);
+    }
+
+    private void disableDatePickers() {
+        fromDateText.setEnabled(false);
+        toDateText.setEnabled(false);
+        fromDateText.setAlpha(0.5f);
+        toDateText.setAlpha(0.5f);
     }
 
     private void setupDatePickers() {
@@ -117,39 +133,44 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
 
     private void showDatePicker(final Calendar date, final TextView dateText) {
         DatePickerDialog dialog = new DatePickerDialog(
-                this,
-                (view, year, month, dayOfMonth) -> {
-                    Calendar selectedDate = Calendar.getInstance();
-                    selectedDate.set(year, month, dayOfMonth);
-
-                    // Don't allow future dates
-                    Calendar today = Calendar.getInstance();
-                    if (selectedDate.after(today)) {
-                        return;
-                    }
-
-                    // For "to" date, don't allow dates before "from" date
-                    if (dateText == toDateText && selectedDate.before(fromDate)) {
-                        return;
-                    }
-
-                    // For "from" date, don't allow dates after "to" date
-                    if (dateText == fromDateText && selectedDate.after(toDate)) {
-                        toDate.setTime(selectedDate.getTime());
-                        toDateText.setText(dateFormat.format(toDate.getTime()));
-                    }
-
-                    date.set(year, month, dayOfMonth);
-                    dateText.setText(dateFormat.format(date.getTime()));
-                },
-                date.get(Calendar.YEAR),
-                date.get(Calendar.MONTH),
-                date.get(Calendar.DAY_OF_MONTH)
+            this,
+            (view, year, month, dayOfMonth) -> {
+                Calendar selectedDate = Calendar.getInstance();
+                selectedDate.set(year, month, dayOfMonth);
+                
+                // Don't allow future dates
+                Calendar today = Calendar.getInstance();
+                if (selectedDate.after(today)) {
+                    return;
+                }
+                
+                // For "to" date, don't allow dates before "from" date
+                if (dateText == toDateText && selectedDate.before(fromDate)) {
+                    return;
+                }
+                
+                // For "from" date, don't allow dates after "to" date
+                if (dateText == fromDateText && selectedDate.after(toDate)) {
+                    toDate.setTime(selectedDate.getTime());
+                    toDateText.setText(dateFormat.format(toDate.getTime()));
+                }
+                
+                date.set(year, month, dayOfMonth);
+                dateText.setText(dateFormat.format(date.getTime()));
+            },
+            date.get(Calendar.YEAR),
+            date.get(Calendar.MONTH),
+            date.get(Calendar.DAY_OF_MONTH)
         );
-
+        
         // Set the maximum date to today
         dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-
+        
+        // Only set minimum date for "to" date picker
+        if (dateText == toDateText) {
+            dialog.getDatePicker().setMinDate(fromDate.getTimeInMillis());
+        }
+        
         dialog.show();
     }
 
@@ -163,8 +184,8 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_request_success);
         dialog.getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         );
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 

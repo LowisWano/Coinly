@@ -119,10 +119,8 @@ public class ConfirmPinActivity extends AppCompatActivity {
                 // PINs match
                 Toast.makeText(this, R.string.pin_success, Toast.LENGTH_SHORT).show();
                 
-                // Short delay before moving to the main screen
                 new Handler().postDelayed(() -> {
-                    // Navigate to main activity
-                    Intent intent = new Intent(ConfirmPinActivity.this, MainActivity.class);
+                    Intent intent = new Intent(ConfirmPinActivity.this, WalletActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     

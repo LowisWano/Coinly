@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -120,31 +121,32 @@ public class WalletActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        try {
-            CustomBottomNavigation bottomNav = findViewById(R.id.bottomNavigation);
-            if (bottomNav != null) {
-                bottomNav.setOnNavigationItemSelectedListener(itemId -> {
-                    if (itemId == R.id.nav_home) {
-                        startActivity(new Intent(this, MainActivity.class));
-                        finish();
-                    } else if (itemId == R.id.nav_wallet) {
-                        // Already on wallet page
-                    } else if (itemId == R.id.nav_qr) {
-                        Toast.makeText(this, "QR Scanner coming soon", Toast.LENGTH_SHORT).show();
-                    } else if (itemId == R.id.nav_transactions) {
-                        startActivity(new Intent(this, TransactionHistoryActivity.class));
-                        finish();
-                    } else if (itemId == R.id.nav_profile) {
-                        Toast.makeText(this, "Profile coming soon", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                
-                // Set wallet as selected
-                bottomNav.setSelectedItem(R.id.nav_wallet);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error setting up bottom navigation", e);
-        }
+        LinearLayout homeButton = findViewById(R.id.homeButton);
+        LinearLayout walletButton = findViewById(R.id.walletButton);
+        LinearLayout qrButton = findViewById(R.id.qrButton);
+        LinearLayout transactionsButton = findViewById(R.id.transactionsButton);
+        LinearLayout profileButton = findViewById(R.id.profileButton);
+
+        transactionsButton.setOnClickListener(v -> {
+            startActivity(new Intent(this, TransactionHistoryActivity.class));
+            finish();
+        });
+
+        walletButton.setOnClickListener(v -> {
+            // TODO: Navigate to Wallet screen
+        });
+
+        qrButton.setOnClickListener(v -> {
+            // TODO: Open QR scanner
+        });
+
+        // Mark transactions button as selected
+        homeButton.setSelected(true);
+
+        profileButton.setOnClickListener(v -> {
+            startActivity(new Intent(this, ProfileActivity.class));
+            finish();
+        });
     }
     
     private void setupSeeAllButtons() {
