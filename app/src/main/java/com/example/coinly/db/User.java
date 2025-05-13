@@ -130,8 +130,7 @@ public class User {
         Map<String, Object> user = Map.of(
                 "credentials", Map.of(
                         "email", credentials.email,
-                        "password", credentials.password, // TODO: Encrypt the password
-                        "pin", credentials.pin
+                        "password", credentials.password // TODO: Encrypt the password
                 ),
                 "details", Map.of(
                         "phoneNumber", details.phoneNumber,
