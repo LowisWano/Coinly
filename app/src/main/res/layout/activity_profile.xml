@@ -337,10 +337,4 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.example.coinly.CustomBottomNavigation
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
-
 </RelativeLayout>
