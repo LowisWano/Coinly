@@ -12,6 +12,11 @@ public class Database {
         void onFailure(Exception e);
     }
 
+    public interface Balance {
+        void onSuccess(float balance);
+        void onFailure(Exception e);
+    }
+
     public static class KeyAlreadyExists extends Exception {
         public KeyAlreadyExists(String message) {
             super(message);

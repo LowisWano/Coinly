@@ -8,6 +8,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.coinly.db.User;
+import com.example.coinly.db.Database;
+import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +43,7 @@ public class WalletActivity extends AppCompatActivity {
         try {
             initViews();
             setupHideBalanceButton();
+            fetchUserBalance();
             loadPocketData();
             loadTransactionData();
             setupPocketsRecyclerView();
@@ -166,4 +170,40 @@ public class WalletActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void fetchUserBalance() {
+    String email = "destin@gmail.com";
+    String password = "password";
+    
+    // Create credentials object
+    User.Credentials credentials = new User.Credentials()
+            .withEmail(email)
+            .withPassword(password);
+    
+    // Call getBalance method
+    User.getBalance(credentials, new Database.Balance() {
+        @Override
+        public void onSuccess(float balance) {
+            runOnUiThread(() -> {
+                // Format the balance as required and update UI
+                actualBalance = String.format("Php %.2f", balance);
+                if (!isBalanceHidden) {
+                    balanceAmount.setText(actualBalance);
+                }
+                // You might want to save this balance for later use
+            });
+        }
+        
+        @Override
+        public void onFailure(Exception e) {
+            runOnUiThread(() -> {
+                // Handle error
+                Log.e(TAG, "Failed to fetch balance", e);
+                Toast.makeText(WalletActivity.this, 
+                        "Could not retrieve balance: " + e.getMessage(), 
+                        Toast.LENGTH_SHORT).show();
+            });
+        }
+    });
+}
 }
