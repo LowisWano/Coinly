@@ -178,4 +178,12 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
 
     }
+
+    public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
+        Database.db().collection("users")
+                .document(id)
+                .update("pin", new String(credentials.pin))
+                .addOnSuccessListener(doc -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
 }
