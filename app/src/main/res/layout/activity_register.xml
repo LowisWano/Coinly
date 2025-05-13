@@ -10,14 +10,13 @@
     <!-- Logo at the top -->
     <ImageView
         android:id="@+id/ivLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="100dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:contentDescription="@string/app_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/coinly_logo_background" />
+        android:background="@drawable/coinlylogo2" />
 
     <!-- Register to Coinly Title -->
     <TextView
@@ -66,8 +65,6 @@
                         android:id="@+id/tvRegisterHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginBottom="24dp"
                         android:text="@string/register_to_coinly"
                         android:textColor="#FFFFFF"
                         android:textSize="20sp"
@@ -231,16 +228,19 @@
                         android:layout_weight="1"
                         android:layout_marginTop="16dp" />
 
-                    <!-- Register button -->
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRegister"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:padding="12dp"
+                        android:layout_marginTop="15dp"
+                        android:paddingHorizontal="40dp"
+                        android:paddingVertical="15dp"
                         android:text="@string/register"
-                        android:backgroundTint="#F4F2C9"
-                        android:textColor="#083248" />
+                        android:textColor="#ffff"
+                        android:textSize="20sp"
+                        android:backgroundTint="#6B201818"
+                        app:cornerRadius="16dp"
+                        android:layout_gravity="center" />
 
                     <TextView
                         android:id="@+id/tvLogin"

@@ -30,7 +30,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Transaction transaction = transactions.get(position);
-        
+
         holder.titleText.setText(transaction.getTitle());
         holder.dateText.setText(transaction.getDate());
         holder.amountText.setText(transaction.getFormattedAmount());

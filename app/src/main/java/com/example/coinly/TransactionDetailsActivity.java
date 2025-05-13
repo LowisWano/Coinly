@@ -48,7 +48,7 @@ public class TransactionDetailsActivity extends AppCompatActivity {
         String formattedAmount = (amount >= 0 ? "+ " : "- ") + "Php " + String.format("%.2f", Math.abs(amount));
         amountText.setText(formattedAmount);
         amountText.setTextColor(amount >= 0 ? 0xFF4CAF50 : 0xFFE91E63);
-        
+
         titleText.setText(title);
         dateText.setText(date);
         senderText.setText(sender);
