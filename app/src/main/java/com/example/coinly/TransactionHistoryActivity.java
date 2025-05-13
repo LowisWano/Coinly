@@ -208,7 +208,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         transactionsButton.setSelected(true);
 
         profileButton.setOnClickListener(v -> {
-            // TODO: Navigate to Profile screen
+            startActivity(new Intent(this, ProfileActivity.class));
+            finish();
         });
     }
 
