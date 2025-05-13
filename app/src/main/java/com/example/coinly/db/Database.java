@@ -11,4 +11,10 @@ public class Database {
         void onSuccess(String id);
         void onFailure(Exception e);
     }
+
+    public static class KeyAlreadyExists extends Exception {
+        public KeyAlreadyExists(String message) {
+            super(message);
+        }
+    }
 }
