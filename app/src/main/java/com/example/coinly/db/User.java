@@ -126,7 +126,7 @@ public class User {
         }
     }
 
-    public static void signUp(Credentials credentials, Details details, Database.ID callback) {
+    public static void signUp(Credentials credentials, Details details, Database.Data<String> callback) {
         Map<String, Object> user = Map.of(
                 "credentials", Map.of(
                         "email", credentials.email,
@@ -162,7 +162,7 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void login(Credentials credentials, Database.ID callback) {
+    public static void login(Credentials credentials, Database.Data<String> callback) {
         Database.db().collection("users")
                 .whereEqualTo("credentials.email", credentials.email)
                 .whereEqualTo("credentials.password", credentials.password) // TODO: Change to use decryption
