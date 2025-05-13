@@ -7,8 +7,8 @@ public class Database {
         return FirebaseFirestore.getInstance();
     }
 
-    public interface ID {
-        void onSuccess(String id);
+    public interface Data<T> {
+        void onSuccess(T data);
         void onFailure(Exception e);
     }
 
