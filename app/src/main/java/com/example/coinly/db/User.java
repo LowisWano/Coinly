@@ -436,12 +436,14 @@ public class User {
                             .withSenderId(senderRef.getId())
                             .withReceiveId(recipientRef.getId())
                             .withAmount(amount)
+                            .withName("Send Money")
                             .withDate(new GregorianCalendar());
 
                     Map<String, Object> txnMap = new HashMap<>();
                     txnMap.put("senderId", txn.senderId);
                     txnMap.put("receiveId", txn.receiveId);
                     txnMap.put("amount", txn.amount);
+                    txnMap.put("name", txn.name);
                     txnMap.put("date", txn.date.getTime());
 
                     DocumentReference txnRef = db.collection("transactions").document(nextId);
