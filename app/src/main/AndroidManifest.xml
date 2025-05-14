@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Coinly"
         tools:targetApi="31">
         <activity
+            android:name=".PocketActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
@@ -31,8 +34,7 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
