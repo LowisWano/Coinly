@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public class User {
@@ -31,10 +32,18 @@ public class User {
         }
 
         @Override
-        public Credentials parser(Map<String, Object> map) {
-            this.email = (String) map.get("email");
-            this.password = (String) map.get("password");
-            this.pin = Optional.ofNullable((String) map.get("pin"))
+        public Credentials parser(Map<String, Object> map) throws Exception {
+            Object rawData = map.get("credentials");
+
+            if (!(rawData instanceof Map)) {
+                throw new Database.DataNotFound("Credentials field not found");
+            }
+
+            Map<?, ?> data = (Map<?, ?>) rawData;
+
+            this.email = (String) data.get("email");
+            this.password = (String) data.get("password");
+            this.pin = Optional.ofNullable((String) data.get("pin"))
                     .map(s -> (s.length() > 4) ? s.substring(0, 4) : s)
                     .orElse("")
                     .toCharArray();
@@ -66,9 +75,17 @@ public class User {
 
             @Override
             public FullName parser(Map<String, Object> map) {
-                this.first = (String) map.get("first");
-                this.last = (String) map.get("last");
-                this.middleInitial = Optional.ofNullable((String) map.get("middleInitial"))
+                Object rawData = map.get("fullName");
+
+                if (!(rawData instanceof Map)) {
+                    return this;
+                }
+
+                Map<?, ?> data = (Map<?, ?>) rawData;
+
+                this.first = (String) data.get("first");
+                this.last = (String) data.get("last");
+                this.middleInitial = Optional.ofNullable((String) data.get("middleInitial"))
                         .filter(s -> !s.isEmpty())
                         .map(s -> s.charAt(0))
                         .orElse('\0');
@@ -97,20 +114,36 @@ public class User {
         }
 
         @Override
-        public Details parser(Map<String, Object> map) {
-            this.phoneNumber = (String) map.get("phoneNumber");
+        public Details parser(Map<String, Object> map) throws Exception {
+            Object rawData = map.get("details");
 
-            Object fullName = map.get("fullName");
+            if (!(rawData instanceof Map<?, ?>)) {
+                throw new Database.DataNotFound("Details field not found");
+            }
 
-            if (fullName instanceof Map) {
-                this.fullName = new FullName().parser((Map<String, Object>) fullName);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) rawData;
+
+            this.phoneNumber = (String) data.get("phoneNumber");
+            this.fullName = new FullName().parser(data);
+
+            Object birthdateObj = data.get("birthdate");
+
+            if (birthdateObj instanceof Map<?, ?>) {
+                Map<?, ?> birthMap = (Map<?, ?>) birthdateObj;
+
+                int year = ((Number) Objects.requireNonNull(birthMap.get("year"))).intValue();
+                int month = ((Number) Objects.requireNonNull(birthMap.get("month"))).intValue();
+                int day = ((Number) Objects.requireNonNull(birthMap.get("day"))).intValue();
+
+                this.birthdate = new GregorianCalendar(year, month, day);
             }
 
             return this;
         }
     }
 
-    public static class Address {
+    public static class Address implements Database.MapParser<Address> {
         String street;
         String barangay;
         String city;
@@ -133,6 +166,24 @@ public class User {
 
         public Address withZipCode(String zipCode) {
             this.zipCode = zipCode;
+            return this;
+        }
+
+        @Override
+        public Address parser(Map<String, Object> map) throws Exception {
+            Object rawData = map.get("address");
+
+            if (!(rawData instanceof Map)) {
+                throw new Database.DataNotFound("Address field not found");
+            }
+
+            Map<?, ?> data = (Map<?, ?>) rawData;
+
+            this.street = (String) data.get("street");
+            this.barangay = (String) data.get("barangay");
+            this.zipCode = (String) data.get("zipCode");
+            this.city = (String) data.get("city");
+
             return this;
         }
     }
@@ -180,7 +231,7 @@ public class User {
                                 "last", details.fullName.last,
                                 "middleInitial", Character.toString(details.fullName.middleInitial)
                         ),
-                        "birthdate", details.birthdate
+                        "birthdate", details.birthdate.getTime()
                 )
         );
 
@@ -300,7 +351,7 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void updateDetails(String id, Credentials credentials, Details details, Database.Data<Void> callback) {
+    public static void updateDetails(String id, Credentials credentials, Details details, Address address, Database.Data<Void> callback) {
         DocumentReference docRef = Database.db().collection("users").document(id);
 
         docRef.get()
@@ -315,7 +366,12 @@ public class User {
                             "details.fullName.first", details.fullName.first,
                             "details.fullName.last", details.fullName.last,
                             "details.fullName.middleInitial", Character.toString(details.fullName.middleInitial),
-                            "details.phoneNumber", details.phoneNumber
+                            "details.phoneNumber", details.phoneNumber,
+                            "details.birthdate", details.birthdate.getTime(),
+                            "address.street", address.street,
+                            "address.barangay", address.barangay,
+                            "address.zipCode", address.zipCode,
+                            "address.city", address.city
                     )
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
                             .addOnFailureListener(callback::onFailure);
