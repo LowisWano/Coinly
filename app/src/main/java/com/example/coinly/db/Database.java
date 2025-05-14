@@ -2,6 +2,8 @@ package com.example.coinly.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Map;
+
 public class Database {
     public static FirebaseFirestore db() {
         return FirebaseFirestore.getInstance();
@@ -10,6 +12,10 @@ public class Database {
     public interface Data<T> {
         void onSuccess(T data);
         void onFailure(Exception e);
+    }
+
+    public interface MapParser<T> {
+        T parser(Map<String, Object> map);
     }
 
     public interface Balance {

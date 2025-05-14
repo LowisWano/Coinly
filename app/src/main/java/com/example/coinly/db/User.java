@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class User {
-    public static class Credentials {
+    public static class Credentials implements Database.MapParser<Credentials> {
         String email;
         String password;
         char[] pin = new char[4];
@@ -28,10 +29,22 @@ public class User {
             this.pin = pin;
             return this;
         }
+
+        @Override
+        public Credentials parser(Map<String, Object> map) {
+            this.email = (String) map.get("email");
+            this.password = (String) map.get("password");
+            this.pin = Optional.ofNullable((String) map.get("pin"))
+                    .map(s -> (s.length() > 4) ? s.substring(0, 4) : s)
+                    .orElse("")
+                    .toCharArray();
+
+            return this;
+        }
     }
 
-    public static class Details {
-        public static class FullName {
+    public static class Details implements Database.MapParser<Details> {
+        public static class FullName implements Database.MapParser<FullName> {
             String first;
             String last;
             char middleInitial;
@@ -48,6 +61,18 @@ public class User {
 
             public FullName withMiddleInitial(char middleInitial) {
                 this.middleInitial = middleInitial;
+                return this;
+            }
+
+            @Override
+            public FullName parser(Map<String, Object> map) {
+                this.first = (String) map.get("first");
+                this.last = (String) map.get("last");
+                this.middleInitial = Optional.ofNullable((String) map.get("middleInitial"))
+                        .filter(s -> !s.isEmpty())
+                        .map(s -> s.charAt(0))
+                        .orElse('\0');
+
                 return this;
             }
         }
@@ -68,6 +93,19 @@ public class User {
 
         public Details withBirthdate(GregorianCalendar birthdate) {
             this.birthdate = birthdate;
+            return this;
+        }
+
+        @Override
+        public Details parser(Map<String, Object> map) {
+            this.phoneNumber = (String) map.get("phoneNumber");
+
+            Object fullName = map.get("fullName");
+
+            if (fullName instanceof Map) {
+                this.fullName = new FullName().parser((Map<String, Object>) fullName);
+            }
+
             return this;
         }
     }
@@ -281,6 +319,34 @@ public class User {
                     )
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
                             .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static <T extends Database.MapParser<T>> void get(String id, Class<T> clazz, Database.Data<T> callback) {
+        Database.db().collection("users")
+                .document(id)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    Map<String, Object> data = querySnapshot.getData();
+
+                    if (data == null) {
+                        callback.onFailure(new Database.DataNotFound("User's data is empty"));
+                        return;
+                    }
+
+                    try {
+                        T instance = clazz.newInstance();
+
+                        callback.onSuccess(instance.parser(data));
+                    } catch (Exception e) {
+                        callback.onFailure(e);
+                    }
                 })
                 .addOnFailureListener(callback::onFailure);
     }
