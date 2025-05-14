@@ -188,11 +188,26 @@ public class User {
         }
     }
 
-    public static class Wallet {
+    public static class Wallet implements Database.MapParser<Wallet> {
         public float balance;
 
         public Wallet withBalance(float balance) {
             this.balance = balance;
+            return this;
+        }
+
+        @Override
+        public Wallet parser(Map<String, Object> map) throws Exception {
+            Object rawData = map.get("wallet");
+
+            if (!(rawData instanceof Map)) {
+                throw new Database.DataNotFound("Wallet field not found");
+            }
+
+            Map<?, ?> data = (Map<?, ?>) rawData;
+
+            this.balance = Float.parseFloat((String) Objects.requireNonNull(data.get("balance")));
+
             return this;
         }
     }
