@@ -3,6 +3,7 @@ package com.example.coinly;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import com.example.coinly.db.User;
+import com.example.coinly.db.Database;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,14 +49,53 @@ public class LoginActivity extends AppCompatActivity {
         // Login button click
         btnLogin.setOnClickListener(v -> {
             if (validateInputs()) {
-                // In a real app, perform network call or check local database
-                // For now, we'll just simulate a successful login
-                Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                // Create credentials object
+                String email = etEmail.getText().toString().trim();
+                String password = etPassword.getText().toString().trim();
                 
-                // Navigate to main activity
-                Intent intent = new Intent(LoginActivity.this, WalletActivity.class);
-                startActivity(intent);
-                finish(); // Close login activity
+                User.Credentials credentials = new User.Credentials()
+                    .withEmail(email)
+                    .withPassword(password);
+                
+                // Show loading indicator
+                findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
+                btnLogin.setEnabled(false);
+                
+                // Authenticate user
+                User.login(credentials, new Database.Data<String>() {
+                    @Override
+                    public void onSuccess(String userId) {
+                        // Hide loading indicator
+                        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+                        
+                        // Store user ID in shared preferences for future use
+                        getSharedPreferences("coinly", MODE_PRIVATE)
+                            .edit()
+                            .putString("userId", userId)
+                            .apply();
+                        
+                        Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                        
+                        // Navigate to main activity
+                        Intent intent = new Intent(LoginActivity.this, WalletActivity.class);
+                        startActivity(intent);
+                        finish(); // Close login activity
+                    }
+                    
+                    @Override
+                    public void onFailure(Exception e) {
+                        // Hide loading indicator
+                        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+                        btnLogin.setEnabled(true);
+                        
+                        String errorMessage = "Login failed";
+                        if (e instanceof Database.DataNotFound) {
+                            errorMessage = "Invalid email or password";
+                        }
+                        
+                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 
