@@ -3,6 +3,8 @@ package com.example.coinly;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -30,6 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
         languageDropdown = findViewById(R.id.language_dropdown_container);
         helpButton = findViewById(R.id.help_button);
         logoutButton = findViewById(R.id.logout_button);
+        updateButton = findViewById(R.id.update_button);
 
         selectedCurrency = findViewById(R.id.currency_selected_value);
         selectedLanguage = findViewById(R.id.language_selected_value);
@@ -91,6 +94,17 @@ public class ProfileActivity extends AppCompatActivity {
             });
 
             dialog.show();
+
+            // After show() so the window is initialized
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawableResource(android.R.color.transparent);
+                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                // Remove unwanted padding by modifying the decor view
+                View decorView = window.getDecorView();
+                decorView.setPadding(50, 0, 50, 0);
+            }
         });
 
         setupBottomNavigation();
