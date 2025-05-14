@@ -232,6 +232,9 @@ public class User {
                                 "middleInitial", Character.toString(details.fullName.middleInitial)
                         ),
                         "birthdate", details.birthdate.getTime()
+                ),
+                "wallet", Map.of(
+                        "balance", 0f
                 )
         );
 
