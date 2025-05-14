@@ -210,7 +210,7 @@ public class User {
 
             Map<?, ?> data = (Map<?, ?>) rawData;
 
-            this.balance = Float.parseFloat((String) Objects.requireNonNull(data.get("balance")));
+            this.balance = (float) Objects.requireNonNull(data.get("balance"));
 
             return this;
         }
