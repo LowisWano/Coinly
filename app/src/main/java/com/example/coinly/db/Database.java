@@ -15,7 +15,7 @@ public class Database {
     }
 
     public interface MapParser<T> {
-        T parser(Map<String, Object> map);
+        T parser(Map<String, Object> map) throws Exception;
     }
 
     public interface Balance {
