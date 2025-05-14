@@ -182,7 +182,7 @@ public class User {
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
         Database.db().collection("users")
                 .document(id)
-                .update("pin", new String(credentials.pin))
+                .update("credentials.pin", new String(credentials.pin))
                 .addOnSuccessListener(doc -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
