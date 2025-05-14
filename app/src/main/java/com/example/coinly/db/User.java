@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public class User {
     public static class Credentials implements Database.MapParser<Credentials> {
-        String email;
-        String password;
-        char[] pin = new char[4];
+        public String email;
+        public String password;
+        public char[] pin = new char[4];
 
         public Credentials withEmail(String email) {
             this.email = email;
@@ -54,9 +54,9 @@ public class User {
 
     public static class Details implements Database.MapParser<Details> {
         public static class FullName implements Database.MapParser<FullName> {
-            String first;
-            String last;
-            char middleInitial;
+            public String first;
+            public String last;
+            public char middleInitial;
 
             public FullName withFirst(String first) {
                 this.first = first;
@@ -94,9 +94,9 @@ public class User {
             }
         }
 
-        String phoneNumber;
-        FullName fullName;
-        GregorianCalendar birthdate;
+        public String phoneNumber;
+        public FullName fullName;
+        public GregorianCalendar birthdate;
 
         public Details withPhoneNumber(String phoneNumber) {
             this.phoneNumber = phoneNumber;
@@ -144,10 +144,10 @@ public class User {
     }
 
     public static class Address implements Database.MapParser<Address> {
-        String street;
-        String barangay;
-        String city;
-        String zipCode;
+        public String street;
+        public String barangay;
+        public String city;
+        public String zipCode;
 
         public Address withStreet(String street) {
             this.street = street;
@@ -189,7 +189,7 @@ public class User {
     }
 
     public static class Wallet {
-        float balance;
+        public float balance;
 
         public Wallet withBalance(float balance) {
             this.balance = balance;
@@ -198,9 +198,9 @@ public class User {
     }
 
     public static class Savings {
-        String name;
-        float target;
-        float balance;
+        public String name;
+        public float target;
+        public float balance;
 
         public Savings withName(String name) {
             this.name = name;
