@@ -107,23 +107,19 @@ public class TransactionHistoryActivity extends AppCompatActivity {
                     allTransactions.add(new Transaction(name, formattedDate, amount, refNum, "Your Wallet", name));
                 }
 
-                // Calculate current balance
-                currentBalance = 0.0;
-                for (Transaction transaction : allTransactions) {
-                    currentBalance += transaction.getAmount();
-                }
+                // // Calculate current balance
+                // currentBalance = 0.0;
+                // for (Transaction transaction : allTransactions) {
+                //     currentBalance += transaction.getAmount();
+                // }
 
-                // Update the UI on the main thread
                 runOnUiThread(() -> {
-                    // Update balance display
                     balanceText.setText(String.format("₱ %,.2f", Math.abs(currentBalance)));
 
-                    // Update filtered transactions
                     filteredTransactions.clear();
                     filteredTransactions.addAll(allTransactions);
                     adapter.notifyDataSetChanged();
                     
-                    // Update the transaction count text
                     TextView transactionCount = findViewById(R.id.transactionCount);
                     transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
                 });
@@ -268,7 +264,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         });
 
         walletButton.setOnClickListener(v -> {
-            // TODO: Navigate to Wallet screen
+            startActivity(new Intent(this, PocketActivity.class));
+            finish();
         });
 
         qrButton.setOnClickListener(v -> {
