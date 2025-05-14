@@ -81,9 +81,14 @@ public class PocketActivity extends AppCompatActivity {
                 
                 @Override
                 public void onViewDetailsClick(Pocket pocket, int position) {
-                    // Handle view details button click
-                    Toast.makeText(PocketActivity.this, "View details for: " + pocket.getName(), Toast.LENGTH_SHORT).show();
-                    // TODO: Navigate to pocket details activity
+                    // Navigate to pocket details activity
+                    Intent intent = new Intent(PocketActivity.this, PocketDetailsActivity.class);
+                    intent.putExtra("POCKET_NAME", pocket.getName());
+                    intent.putExtra("POCKET_TARGET", pocket.getTargetAmount());
+                    intent.putExtra("POCKET_CURRENT", pocket.getCurrentAmount());
+                    intent.putExtra("POCKET_ICON", pocket.getIconResourceId());
+                    intent.putExtra("POCKET_LOCKED", pocket.isLocked());
+                    startActivity(intent);
                 }
                 
                 @Override
