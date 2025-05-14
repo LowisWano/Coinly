@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.AdapterView;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
     private Spinner dateRangeSpinner;
     private TextView fromDateText;
     private TextView toDateText;
+    private Button submitButton;
     private Calendar fromDate = Calendar.getInstance();
     private Calendar toDate = Calendar.getInstance();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
@@ -42,7 +44,6 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         initializeViews();
         setupDateRangeSpinner();
         setupDatePickers();
-        setupSubmitButton();
     }
 
     private void setupToolbar() {
@@ -56,10 +57,13 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         dateRangeSpinner = findViewById(R.id.dateRangeSpinner);
         fromDateText = findViewById(R.id.fromDateText);
         toDateText = findViewById(R.id.toDateText);
+        submitButton = findViewById(R.id.submitButton);
 
         // Set current date as default
         fromDateText.setText(dateFormat.format(fromDate.getTime()));
         toDateText.setText(dateFormat.format(toDate.getTime()));
+
+        submitButton.setOnClickListener(v -> showSuccessDialog());
     }
 
     private void setupDateRangeSpinner() {
@@ -74,6 +78,8 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         dateRangeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                submitButton.setEnabled(position != 0);
+
                 switch (position) {
                     case 1: // Last 7 days
                         setDateRange(7);
@@ -172,12 +178,6 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         }
         
         dialog.show();
-    }
-
-    private void setupSubmitButton() {
-        findViewById(R.id.submitButton).setOnClickListener(v -> {
-            showSuccessDialog();
-        });
     }
 
     private void showSuccessDialog() {
