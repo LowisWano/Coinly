@@ -3,14 +3,12 @@ package com.example.coinly;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.coinly.db.User;
 import com.example.coinly.db.Database;
-import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,11 +36,14 @@ public class WalletActivity extends AppCompatActivity {
     private boolean isBalanceHidden = false;
     private String actualBalance = "Php 1,242.69";
     private String hiddenBalance = "Php ••••••";
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet);
+
+        userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
 
         try {
             initViews();
@@ -66,12 +67,30 @@ public class WalletActivity extends AppCompatActivity {
         balanceAmount = findViewById(R.id.balanceAmount);
         hideBalanceButton = findViewById(R.id.hideBalanceButton);
 
-        // Set user name dynamically (would come from user profile in a real app)
-        TextView userNameTextView = findViewById(R.id.userName);
-        userNameTextView.setText("John Doe");
-        
         // Set initial balance
         balanceAmount.setText(actualBalance);
+
+        User.get(
+                userId,
+                User.Details.class,
+                new Database.Data<User.Details>() {
+                    @Override
+                    public void onSuccess(User.Details data) {
+                        ((TextView) findViewById(R.id.userName)).setText(String.format(
+                                "%s %s%s",
+                                data.fullName.first,
+                                (data.fullName.middleInitial != '\0') ? data.fullName.middleInitial + ". " : "",
+                                data.fullName.last
+                                )
+                        );
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("Wallet", "Tried to get user's details", e);
+                    }
+                }
+        );
     }
 
     private void setupHideBalanceButton() {
@@ -237,38 +256,24 @@ public class WalletActivity extends AppCompatActivity {
     }
 
     private void fetchUserBalance() {
-    String email = "destin@gmail.com";
-    String password = "password";
-    
-    // Create credentials object
-    User.Credentials credentials = new User.Credentials()
-            .withEmail(email)
-            .withPassword(password);
-    
-    // Call getBalance method
-    User.getBalance(credentials, new Database.Balance() {
-        @Override
-        public void onSuccess(float balance) {
-            runOnUiThread(() -> {
-                // Format the balance as required and update UI
-                actualBalance = String.format("Php %.2f", balance);
-                if (!isBalanceHidden) {
-                    balanceAmount.setText(actualBalance);
+        User.get(
+                userId,
+                User.Wallet.class,
+                new Database.Data<User.Wallet>() {
+                    @Override
+                    public void onSuccess(User.Wallet data) {
+                        actualBalance = String.format("Php %.2f", data.balance);
+
+                        if (!isBalanceHidden) {
+                            balanceAmount.setText(actualBalance);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("Wallet", "Tried to get user's balance", e);
+                    }
                 }
-                // You might want to save this balance for later use
-            });
-        }
-        
-        @Override
-        public void onFailure(Exception e) {
-            runOnUiThread(() -> {
-                // Handle error
-                Log.e(TAG, "Failed to fetch balance", e);
-                Toast.makeText(WalletActivity.this, 
-                        "Could not retrieve balance: " + e.getMessage(), 
-                        Toast.LENGTH_SHORT).show();
-            });
-        }
-    });
-}
+        );
+    }
 }

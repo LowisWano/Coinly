@@ -130,16 +130,11 @@ public class User {
             this.phoneNumber = (String) data.get("phoneNumber");
             this.fullName = new FullName().parser(data);
 
-            Object birthdateObj = data.get("birthdate");
+            Object birthdate = data.get("birthdate");
 
-            if (birthdateObj instanceof Map<?, ?>) {
-                Map<?, ?> birthMap = (Map<?, ?>) birthdateObj;
-
-                int year = ((Number) Objects.requireNonNull(birthMap.get("year"))).intValue();
-                int month = ((Number) Objects.requireNonNull(birthMap.get("month"))).intValue();
-                int day = ((Number) Objects.requireNonNull(birthMap.get("day"))).intValue();
-
-                this.birthdate = new GregorianCalendar(year, month, day);
+            if (birthdate instanceof Date) {
+                this.birthdate = new GregorianCalendar();
+                this.birthdate.setTime((Date) birthdate);
             }
 
             return this;
