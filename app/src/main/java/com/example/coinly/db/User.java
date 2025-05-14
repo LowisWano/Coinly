@@ -2,7 +2,7 @@ package com.example.coinly.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 public class User {
@@ -49,15 +49,21 @@ public class User {
             }
         }
 
+        String phoneNumber;
         FullName fullName;
-        Date birthdate;
+        GregorianCalendar birthdate;
+
+        public Details withPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
 
         public Details withFullName(FullName fullName) {
             this.fullName = fullName;
             return this;
         }
 
-        public Details withBirthdate(Date birthdate) {
+        public Details withBirthdate(GregorianCalendar birthdate) {
             this.birthdate = birthdate;
             return this;
         }
@@ -103,7 +109,7 @@ public class User {
         String name;
         float target;
         float balance;
-        
+
         public Savings withName(String name) {
             this.name = name;
             return this;
@@ -120,17 +126,27 @@ public class User {
         }
     }
 
-    public static void signUp(Credentials credentials, Database.ID callback) {
+    public static void signUp(Credentials credentials, Details details, Database.Data<String> callback) {
         Map<String, Object> user = Map.of(
-                "email", credentials.email,
-                "password", credentials.password, // TODO: Encrypt the password
-                "pin", credentials.pin
+                "credentials", Map.of(
+                        "email", credentials.email,
+                        "password", credentials.password // TODO: Encrypt the password
+                ),
+                "details", Map.of(
+                        "phoneNumber", details.phoneNumber,
+                        "fullName", Map.of(
+                                "first", details.fullName.first,
+                                "last", details.fullName.last,
+                                "middleInitial", Character.toString(details.fullName.middleInitial)
+                        ),
+                        "birthdate", details.birthdate
+                )
         );
 
         FirebaseFirestore db = Database.db();
 
         db.collection("users")
-                .whereEqualTo("email", credentials.email)
+                .whereEqualTo("credentials.email", credentials.email)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
@@ -146,10 +162,10 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void login(Credentials credentials, Database.ID callback) {
+    public static void login(Credentials credentials, Database.Data<String> callback) {
         Database.db().collection("users")
-                .whereEqualTo("email", credentials.email)
-                .whereEqualTo("password", credentials.password) // TODO: Change to use decryption
+                .whereEqualTo("credentials.email", credentials.email)
+                .whereEqualTo("credentials.password", credentials.password) // TODO: Change to use decryption
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
@@ -161,5 +177,13 @@ public class User {
                 })
                 .addOnFailureListener(callback::onFailure);
 
+    }
+
+    public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
+        Database.db().collection("users")
+                .document(id)
+                .update("pin", new String(credentials.pin))
+                .addOnSuccessListener(doc -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
     }
 }
