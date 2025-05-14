@@ -2,6 +2,9 @@ package com.example.coinly;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -12,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class ProfileActivity extends AppCompatActivity {
     LinearLayout currencyDropdown, languageDropdown, helpButton, logoutButton;
     TextView selectedCurrency, selectedLanguage;
+    Button updateButton;
 
     String[] currencies = {"PHP", "USD", "EUR"};
     String[] languages = {"English", "Filipino", "Japanese"};
@@ -50,6 +54,43 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
+        });
+
+        helpButton.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, HelpActivity.class);
+            startActivity(intent);
+        });
+
+        updateButton.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+            builder.setCancelable(true);
+
+            // Inflate the dialog view
+            View view = getLayoutInflater().inflate(R.layout.dialog_update_profile, null);
+            builder.setView(view);
+            AlertDialog dialog = builder.create();
+
+            // Hook elements inside the dialog
+            EditText birthdateInput = view.findViewById(R.id.edit_birthdate);
+            Button updateBtn = view.findViewById(R.id.update_btn);
+            Button editPinBtn = view.findViewById(R.id.edit_pin_btn);
+
+            // Optional: Date picker
+            birthdateInput.setOnClickListener(v1 -> {
+                // Add date picker logic here if needed
+            });
+
+            // Example: Handle update click
+            updateBtn.setOnClickListener(v2 -> {
+                // Collect and validate data...
+                dialog.dismiss(); // Close dialog after update
+            });
+
+            editPinBtn.setOnClickListener(v3 -> {
+                // TODO: Add pin change logic or navigation
+            });
+
+            dialog.show();
         });
 
         setupBottomNavigation();
