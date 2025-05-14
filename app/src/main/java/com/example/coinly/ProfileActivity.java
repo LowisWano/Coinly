@@ -79,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileButton.setSelected(true);
 
         homeButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
+            startActivity(new Intent(this, WalletActivity.class));
             finish();
         });
     }
