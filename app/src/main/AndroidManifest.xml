@@ -27,11 +27,14 @@
             android:name=".PocketActivity"
             android:exported="false" />
         <activity
+            android:name=".HelpActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".QRScanner"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".RequestTransactionHistoryActivity"
             android:exported="false" />

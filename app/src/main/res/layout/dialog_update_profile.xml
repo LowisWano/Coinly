@@ -230,7 +230,7 @@
                 android:layout_marginLeft="5dp"
                 android:contentDescription="Locked"
                 android:visibility="visible"/>
-
+          
             <EditText
                 android:id="@+id/edit_birthdate"
                 android:layout_width="match_parent"
@@ -253,6 +253,7 @@
             android:orientation="horizontal"
             android:gravity="center"
             android:layout_marginTop="15dp"
+
             android:weightSum="2">
 
             <Button
