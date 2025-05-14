@@ -333,6 +333,39 @@ public class User {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
+
+    public static void getPockets(Credentials credentials, Database.Data<List<Map<String, Object>>> callback) {
+        Database.db().collection("users")
+                .whereEqualTo("credentials.email", credentials.email)
+                .whereEqualTo("credentials.password", credentials.password)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    // Get the pockets from the first document that matches
+                    Object bankDetails = querySnapshot.getDocuments().get(0).get("bankDetails");
+                    
+                    if (!(bankDetails instanceof Map)) {
+                        callback.onSuccess(new ArrayList<>()); // Return empty list if no bank details
+                        return;
+                    }
+                    
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> bankDetailsMap = (Map<String, Object>) bankDetails;
+                    List<Map<String, Object>> pockets = (List<Map<String, Object>>) bankDetailsMap.get("pockets");
+                    
+                    if (pockets == null || pockets.isEmpty()) {
+                        callback.onSuccess(new ArrayList<>()); // Return empty list if no pockets
+                        return;
+                    }
+
+                    callback.onSuccess(pockets);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
     
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
         DocumentReference docRef = Database.db().collection("users").document(id);

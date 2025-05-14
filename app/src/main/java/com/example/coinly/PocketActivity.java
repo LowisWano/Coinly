@@ -1,15 +1,21 @@
 package com.example.coinly;
 
-import android.os.Bundle;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.widget.ImageButton;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.coinly.db.Database;
+import com.example.coinly.db.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,12 +64,85 @@ public class PocketActivity extends AppCompatActivity {
     }
     
     private void loadPocketData() {
-        // In a real app, this data would come from a database or API
         pocketsList = new ArrayList<>();
         
-        // Using our utility class to get appropriate icons for each category
-        pocketsList.add(new Pocket("Home", 50000.00, 43000.00, android.R.drawable.ic_menu_directions, false));
-        pocketsList.add(new Pocket("Vehicle", 120000.00, 24000.00, android.R.drawable.ic_menu_directions, true));
+        // Get userId from SharedPreferences
+        String userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", null);
+        
+        // If no userId found, use hardcoded credentials for testing
+        if (userId == null) {
+            // Fallback to hardcoded data for testing
+            pocketsList.add(new Pocket("Homezzzzz", 50000.00, 43000.00, android.R.drawable.ic_menu_directions, false));
+            pocketsList.add(new Pocket("Vehicle", 120000.00, 24000.00, android.R.drawable.ic_menu_directions, true));
+            return;
+        }
+        
+        // Get user credentials from SharedPreferences or hardcode for testing
+        String email = "l@gmail.com"; // In real app, get from SharedPreferences
+        String password = "password";       // In real app, get from SharedPreferences or keystore
+        
+        // Create credentials object
+        User.Credentials credentials = new User.Credentials()
+                .withEmail(email)
+                .withPassword(password);
+        
+        // Call getPockets method
+        User.getPockets(credentials, new Database.Data<List<Map<String, Object>>>() {
+            @Override
+            public void onSuccess(List<Map<String, Object>> pockets) {
+                // Convert Firebase data to Pocket objects
+                pocketsList.clear();
+                for (Map<String, Object> pocketData : pockets) {
+                    String name = (String) pocketData.get("name");
+                    boolean isActive = (boolean) pocketData.getOrDefault("isActive", true);
+                    
+                    // Handle numeric types which could be Double, Long, or Integer
+                    Number targetAmount = (Number) pocketData.getOrDefault("targetAmount", 0);
+                    Number currentAmount = (Number) pocketData.getOrDefault("currentAmount", 0);
+                    
+                    // Add the pocket to the list with an appropriate icon
+                    // In a real app, you might want to map pocket types to specific icons
+                    int iconResId = android.R.drawable.ic_menu_directions;
+                    
+                    pocketsList.add(new Pocket(
+                            name, 
+                            targetAmount.doubleValue(), 
+                            currentAmount.doubleValue(), 
+                            iconResId, 
+                            !isActive));
+                }
+                
+                // Update UI on main thread
+                runOnUiThread(() -> {
+                    if (pocketAdapter != null) {
+                        pocketAdapter.notifyDataSetChanged();
+                    } else {
+                        setupPocketsRecyclerView();
+                    }
+                });
+            }
+            
+            @Override
+            public void onFailure(Exception e) {
+                // If failed to get pockets, use hardcoded data
+                runOnUiThread(() -> {
+                    Toast.makeText(PocketActivity.this, 
+                            "Failed to load pockets: " + e.getMessage(), 
+                            Toast.LENGTH_SHORT).show();
+                    
+                    // Use fallback data
+                    pocketsList.clear();
+                    pocketsList.add(new Pocket("Home", 50000.00, 43000.00, android.R.drawable.ic_menu_directions, false));
+                    pocketsList.add(new Pocket("Vehicle", 120000.00, 24000.00, android.R.drawable.ic_menu_directions, true));
+                    
+                    if (pocketAdapter != null) {
+                        pocketAdapter.notifyDataSetChanged();
+                    } else {
+                        setupPocketsRecyclerView();
+                    }
+                });
+            }
+        });
     }
     
     private void setupPocketsRecyclerView() {
