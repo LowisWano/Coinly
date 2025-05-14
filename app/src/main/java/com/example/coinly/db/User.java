@@ -7,6 +7,7 @@ import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -399,102 +400,141 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void sendMoneyFromPhoneNumber(String id, String to, float amount, Database.Data<Void> callback) {
+    private static void getSender(String id, Database.Data<DocumentSnapshot> callback) {
         FirebaseFirestore db = Database.db();
-
-        DocumentReference senderRef = db.collection("users").document(id);
-        Query recipientQuery = db.collection("users").whereEqualTo("details.phoneNumber", to);
-
-        senderRef.get()
-                .addOnSuccessListener(senderSnapshot -> {
-                    if (!senderSnapshot.exists()) {
-                        callback.onFailure(new Database.DataNotFound("User not found"));
-                        return;
+        db.collection("users").document(id).get()
+                .addOnSuccessListener(snapshot -> {
+                    if (!snapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("Sender not found"));
+                    } else {
+                        callback.onSuccess(snapshot);
                     }
-
-                    Map<String, Object> senderDetails = (Map<String, Object>) senderSnapshot.get("details");
-                    String senderPhone = (String) senderDetails.get("phoneNumber");
-
-                    if (senderPhone != null && senderPhone.equals(to)) {
-                        callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
-                        return;
-                    }
-
-                    recipientQuery.get()
-                            .addOnSuccessListener(querySnapshot -> {
-                                if (querySnapshot.isEmpty()) {
-                                    callback.onFailure(new Database.DataNotFound("Recipient not found"));
-                                    return;
-                                }
-
-                                DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
-                                DocumentReference recipientRef = recipientSnapshot.getReference();
-
-                                db.runTransaction(transaction -> {
-                                    float senderBalance = Objects.requireNonNull(senderSnapshot.getDouble("wallet.balance")).floatValue();
-                                    float recipientBalance = Objects.requireNonNull(recipientSnapshot.getDouble("wallet.balance")).floatValue();
-
-                                    if (senderBalance < amount) {
-                                        throw new IllegalArgumentException("Insufficient balance");
-                                    }
-
-                                    transaction.update(senderRef, "wallet.balance", senderBalance - amount);
-                                    transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
-
-                                    return null;
-                                })
-                                        .addOnSuccessListener(doc -> callback.onSuccess(null))
-                                        .addOnFailureListener(callback::onFailure);
-                            })
-                            .addOnFailureListener(callback::onFailure);
                 })
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void sendMoneyFromUserID(String id, String to, float amount, Database.Data<Void> callback) {
-        if (id.equals(to)) {
+    private static void executeMoneyTransfer(
+            DocumentReference senderRef,
+            DocumentSnapshot senderSnapshot,
+            DocumentReference recipientRef,
+            DocumentSnapshot recipientSnapshot,
+            float amount,
+            Database.Data<Void> callback
+    ) {
+        FirebaseFirestore db = Database.db();
+        DocumentReference counterRef = db.collection("counters").document("transactions");
+
+        db.runTransaction(transaction -> {
+                    float senderBalance = Objects.requireNonNull(senderSnapshot.getDouble("wallet.balance")).floatValue();
+                    float recipientBalance = Objects.requireNonNull(recipientSnapshot.getDouble("wallet.balance")).floatValue();
+
+                    if (senderBalance < amount) {
+                        throw new IllegalArgumentException("Insufficient balance");
+                    }
+
+                    transaction.update(senderRef, "wallet.balance", senderBalance - amount);
+                    transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
+
+                    DocumentSnapshot counterSnapshot = transaction.get(counterRef);
+                    long nextId = counterSnapshot.getLong("value") + 1;
+                    transaction.update(counterRef, "value", nextId);
+
+                    Transaction txn = new Transaction()
+                            .withSenderId(senderRef.getId())
+                            .withReceiveId(recipientRef.getId())
+                            .withAmount(amount)
+                            .withDate(new GregorianCalendar());
+
+                    Map<String, Object> txnMap = new HashMap<>();
+                    txnMap.put("senderId", txn.senderId);
+                    txnMap.put("receiveId", txn.receiveId);
+                    txnMap.put("amount", txn.amount);
+                    txnMap.put("date", txn.date.getTime());
+
+                    DocumentReference txnRef = db.collection("transactions").document(String.valueOf(nextId));
+                    transaction.set(txnRef, txnMap);
+
+                    return null;
+                })
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<Void> callback) {
+        FirebaseFirestore db = Database.db();
+        DocumentReference senderRef = db.collection("users").document(id);
+
+        getSender(id, new Database.Data<>() {
+            @Override
+            public void onSuccess(DocumentSnapshot senderSnapshot) {
+                Map<String, Object> senderDetails = (Map<String, Object>) senderSnapshot.get("details");
+
+                if (senderDetails == null) {
+                    callback.onFailure(new IllegalArgumentException("Sender 'details' field is missing from the document."));
+                    return;
+                }
+
+                String senderPhone = (String) senderDetails.get("phoneNumber");
+
+                if (senderPhone != null && senderPhone.equals(toPhone)) {
+                    callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
+                    return;
+                }
+
+                db.collection("users")
+                        .whereEqualTo("details.phoneNumber", toPhone)
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            if (querySnapshot.isEmpty()) {
+                                callback.onFailure(new Database.DataNotFound("Recipient not found"));
+                                return;
+                            }
+
+                            DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
+                            DocumentReference recipientRef = recipientSnapshot.getReference();
+
+                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
+                        })
+                        .addOnFailureListener(callback::onFailure);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<Void> callback) {
+        if (id.equals(toUserId)) {
             callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
             return;
         }
 
         FirebaseFirestore db = Database.db();
-
         DocumentReference senderRef = db.collection("users").document(id);
-        DocumentReference recipientRef = db.collection("users").document(to);
+        DocumentReference recipientRef = db.collection("users").document(toUserId);
 
-        senderRef.get()
-                .addOnSuccessListener(senderSnapshot -> {
-                    if (!senderSnapshot.exists()) {
-                        callback.onFailure(new Database.DataNotFound("Sender not found"));
-                        return;
-                    }
+        getSender(id, new Database.Data<>() {
+            @Override
+            public void onSuccess(DocumentSnapshot senderSnapshot) {
+                recipientRef.get()
+                        .addOnSuccessListener(recipientSnapshot -> {
+                            if (!recipientSnapshot.exists()) {
+                                callback.onFailure(new Database.DataNotFound("Recipient not found"));
+                                return;
+                            }
 
-                    recipientRef.get()
-                            .addOnSuccessListener(recipientSnapshot -> {
-                                if (!recipientSnapshot.exists()) {
-                                    callback.onFailure(new Database.DataNotFound("Recipient not found"));
-                                    return;
-                                }
+                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
+                        })
+                        .addOnFailureListener(callback::onFailure);
+            }
 
-                                db.runTransaction(transaction -> {
-                                    float senderBalance = senderSnapshot.getDouble("wallet.balance").floatValue();
-                                    float recipientBalance = recipientSnapshot.getDouble("wallet.balance").floatValue();
-
-                                    if (senderBalance < amount) {
-                                        throw new IllegalArgumentException("Insufficient funds");
-                                    }
-
-                                    transaction.update(senderRef, "wallet.balance", senderBalance - amount);
-                                    transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
-
-                                    return null;
-                                })
-                                        .addOnSuccessListener(aVoid -> callback.onSuccess(null))
-                                        .addOnFailureListener(callback::onFailure);
-                            })
-                            .addOnFailureListener(callback::onFailure);
-                })
-                .addOnFailureListener(callback::onFailure);
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
     }
 
     public static <T extends Database.MapParser<T>> void get(String id, Class<T> clazz, Database.Data<T> callback) {
