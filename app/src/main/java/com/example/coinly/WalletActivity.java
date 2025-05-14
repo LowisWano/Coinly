@@ -201,7 +201,8 @@ public class WalletActivity extends AppCompatActivity {
         });
 
         walletButton.setOnClickListener(v -> {
-            // TODO: Navigate to Wallet screen
+            startActivity(new Intent(this, PocketActivity.class));
+            finish();
         });
 
         qrButton.setOnClickListener(v -> {
