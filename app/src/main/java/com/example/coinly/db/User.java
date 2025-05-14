@@ -419,9 +419,7 @@ public class User {
 
     private static void executeMoneyTransfer(
             DocumentReference senderRef,
-            DocumentSnapshot senderSnapshot,
             DocumentReference recipientRef,
-            DocumentSnapshot recipientSnapshot,
             float amount,
             Database.Data<String> callback
     ) {
@@ -469,7 +467,7 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<String> callback) {
+    public static void sendMoney(String id, String toPhone, float amount, Database.Data<String> callback) {
         FirebaseFirestore db = Database.db();
         DocumentReference senderRef = db.collection("users").document(id);
 
@@ -502,39 +500,7 @@ public class User {
                             DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
                             DocumentReference recipientRef = recipientSnapshot.getReference();
 
-                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
-                        })
-                        .addOnFailureListener(callback::onFailure);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                callback.onFailure(e);
-            }
-        });
-    }
-
-    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<String> callback) {
-        if (id.equals(toUserId)) {
-            callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
-            return;
-        }
-
-        FirebaseFirestore db = Database.db();
-        DocumentReference senderRef = db.collection("users").document(id);
-        DocumentReference recipientRef = db.collection("users").document(toUserId);
-
-        getSender(id, new Database.Data<>() {
-            @Override
-            public void onSuccess(DocumentSnapshot senderSnapshot) {
-                recipientRef.get()
-                        .addOnSuccessListener(recipientSnapshot -> {
-                            if (!recipientSnapshot.exists()) {
-                                callback.onFailure(new Database.DataNotFound("Recipient not found"));
-                                return;
-                            }
-
-                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
+                            executeMoneyTransfer(senderRef, recipientRef, amount, callback);
                         })
                         .addOnFailureListener(callback::onFailure);
             }
