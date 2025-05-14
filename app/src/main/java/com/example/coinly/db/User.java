@@ -429,8 +429,12 @@ public class User {
         DocumentReference counterRef = db.collection("counters").document("transactions");
 
         db.runTransaction(transaction -> {
-                    float senderBalance = Objects.requireNonNull(senderSnapshot.getDouble("wallet.balance")).floatValue();
-                    float recipientBalance = Objects.requireNonNull(recipientSnapshot.getDouble("wallet.balance")).floatValue();
+                    DocumentSnapshot senderSnap = transaction.get(senderRef);
+                    DocumentSnapshot recipientSnap = transaction.get(recipientRef);
+                    DocumentSnapshot counterSnap = transaction.get(counterRef);
+
+                    float senderBalance = Objects.requireNonNull(senderSnap.getDouble("wallet.balance")).floatValue();
+                    float recipientBalance = Objects.requireNonNull(recipientSnap.getDouble("wallet.balance")).floatValue();
 
                     if (senderBalance < amount) {
                         throw new IllegalArgumentException("Insufficient balance");
@@ -439,9 +443,10 @@ public class User {
                     transaction.update(senderRef, "wallet.balance", senderBalance - amount);
                     transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
 
-                    DocumentSnapshot counterSnapshot = transaction.get(counterRef);
-                    String nextId = Long.toString(counterSnapshot.getLong("value") + 1);
-                    transaction.update(counterRef, "value", nextId);
+                    long nextValue = counterSnap.getLong("value") + 1;
+                    transaction.update(counterRef, "value", nextValue);
+
+                    String nextId = Long.toString(nextValue);
 
                     Transaction txn = new Transaction()
                             .withSenderId(senderRef.getId())
@@ -460,7 +465,7 @@ public class User {
 
                     return nextId;
                 })
-                .addOnSuccessListener(id -> callback.onSuccess(id))
+                .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
     }
 
