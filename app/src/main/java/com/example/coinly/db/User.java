@@ -1,5 +1,6 @@
 package com.example.coinly.db;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.GregorianCalendar;
@@ -181,10 +182,21 @@ public class User {
     }
 
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
-        Database.db().collection("users")
-                .document(id)
-                .update("credentials.pin", new String(credentials.pin))
-                .addOnSuccessListener(doc -> callback.onSuccess(null))
+        DocumentReference docRef = Database.db().collection("users").document(id);
+
+        docRef.get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    docRef.update("credentials.pin", new String(credentials.pin))
+                            .addOnSuccessListener(doc -> callback.onSuccess(null))
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
                 .addOnFailureListener(callback::onFailure);
     }
 }
