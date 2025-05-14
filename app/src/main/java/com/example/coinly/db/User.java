@@ -1,10 +1,13 @@
 package com.example.coinly.db;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,9 +15,9 @@ import java.util.Optional;
 
 public class User {
     public static class Credentials implements Database.MapParser<Credentials> {
-        String email;
-        String password;
-        char[] pin = new char[4];
+        public String email;
+        public String password;
+        public char[] pin = new char[4];
 
         public Credentials withEmail(String email) {
             this.email = email;
@@ -54,9 +57,9 @@ public class User {
 
     public static class Details implements Database.MapParser<Details> {
         public static class FullName implements Database.MapParser<FullName> {
-            String first;
-            String last;
-            char middleInitial;
+            public String first;
+            public String last;
+            public char middleInitial;
 
             public FullName withFirst(String first) {
                 this.first = first;
@@ -94,9 +97,9 @@ public class User {
             }
         }
 
-        String phoneNumber;
-        FullName fullName;
-        GregorianCalendar birthdate;
+        public String phoneNumber;
+        public FullName fullName;
+        public GregorianCalendar birthdate;
 
         public Details withPhoneNumber(String phoneNumber) {
             this.phoneNumber = phoneNumber;
@@ -144,10 +147,10 @@ public class User {
     }
 
     public static class Address implements Database.MapParser<Address> {
-        String street;
-        String barangay;
-        String city;
-        String zipCode;
+        public String street;
+        public String barangay;
+        public String city;
+        public String zipCode;
 
         public Address withStreet(String street) {
             this.street = street;
@@ -188,19 +191,39 @@ public class User {
         }
     }
 
-    public static class Wallet {
-        float balance;
+    public static class Wallet implements Database.MapParser<Wallet> {
+        public double balance;
 
-        public Wallet withBalance(float balance) {
+        public Wallet withBalance(double balance) {
             this.balance = balance;
+            return this;
+        }
+
+        @Override
+        public Wallet parser(Map<String, Object> map) throws Exception {
+            Object rawData = map.get("wallet");
+
+            if (!(rawData instanceof Map)) {
+                throw new Database.DataNotFound("Wallet field not found");
+            }
+
+            Map<?, ?> data = (Map<?, ?>) rawData;
+            Object balance = data.get("balance");
+
+            if (balance instanceof Long) {
+                this.balance = ((Long) balance).doubleValue();
+            } else if (balance instanceof Double) {
+                this.balance = (Double) balance;
+            }
+
             return this;
         }
     }
 
     public static class Savings {
-        String name;
-        float target;
-        float balance;
+        public String name;
+        public float target;
+        public float balance;
 
         public Savings withName(String name) {
             this.name = name;
@@ -232,6 +255,9 @@ public class User {
                                 "middleInitial", Character.toString(details.fullName.middleInitial)
                         ),
                         "birthdate", details.birthdate.getTime()
+                ),
+                "wallet", Map.of(
+                        "balance", 0f
                 )
         );
 
@@ -285,7 +311,7 @@ public class User {
 
                     // Get the balance from the first document that matches
                     Object balance = querySnapshot.getDocuments().get(0).get("balance");
-                    
+
                     if (balance == null) {
                         callback.onFailure(new Database.DataNotFound("Balance not found"));
                         return;
@@ -323,7 +349,7 @@ public class User {
 
                     // Get the transactions from the first document that matches
                     List<Map<String, Object>> transactions = (List<Map<String, Object>>) querySnapshot.getDocuments().get(0).get("transactions");
-                    
+
                     if (transactions == null || transactions.isEmpty()) {
                         callback.onSuccess(new ArrayList<>()); // Return empty list if no transactions
                         return;
@@ -334,39 +360,6 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void getPockets(Credentials credentials, Database.Data<List<Map<String, Object>>> callback) {
-        Database.db().collection("users")
-                .whereEqualTo("credentials.email", credentials.email)
-                .whereEqualTo("credentials.password", credentials.password)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (querySnapshot.isEmpty()) {
-                        callback.onFailure(new Database.DataNotFound("User not found"));
-                        return;
-                    }
-
-                    // Get the pockets from the first document that matches
-                    Object bankDetails = querySnapshot.getDocuments().get(0).get("bankDetails");
-                    
-                    if (!(bankDetails instanceof Map)) {
-                        callback.onSuccess(new ArrayList<>()); // Return empty list if no bank details
-                        return;
-                    }
-                    
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> bankDetailsMap = (Map<String, Object>) bankDetails;
-                    List<Map<String, Object>> pockets = (List<Map<String, Object>>) bankDetailsMap.get("pockets");
-                    
-                    if (pockets == null || pockets.isEmpty()) {
-                        callback.onSuccess(new ArrayList<>()); // Return empty list if no pockets
-                        return;
-                    }
-
-                    callback.onSuccess(pockets);
-                })
-                .addOnFailureListener(callback::onFailure);
-    }
-    
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
         DocumentReference docRef = Database.db().collection("users").document(id);
 
@@ -398,18 +391,161 @@ public class User {
                             "credentials.password", credentials.password,
                             "details.fullName.first", details.fullName.first,
                             "details.fullName.last", details.fullName.last,
-                            "details.fullName.middleInitial", Character.toString(details.fullName.middleInitial),
+                            "details.fullname.middleInitial", Character.toString(details.fullName.middleInitial),
                             "details.phoneNumber", details.phoneNumber,
                             "details.birthdate", details.birthdate.getTime(),
                             "address.street", address.street,
                             "address.barangay", address.barangay,
-                            "address.zipCode", address.zipCode,
-                            "address.city", address.city
-                    )
+                            "address.city", address.city,
+                            "address.zipCode", address.zipCode
+                            )
+
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
                             .addOnFailureListener(callback::onFailure);
                 })
                 .addOnFailureListener(callback::onFailure);
+    }
+
+    private static void getSender(String id, Database.Data<DocumentSnapshot> callback) {
+        FirebaseFirestore db = Database.db();
+        db.collection("users").document(id).get()
+                .addOnSuccessListener(snapshot -> {
+                    if (!snapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("Sender not found"));
+                    } else {
+                        callback.onSuccess(snapshot);
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    private static void executeMoneyTransfer(
+            DocumentReference senderRef,
+            DocumentSnapshot senderSnapshot,
+            DocumentReference recipientRef,
+            DocumentSnapshot recipientSnapshot,
+            float amount,
+            Database.Data<String> callback
+    ) {
+        FirebaseFirestore db = Database.db();
+        DocumentReference counterRef = db.collection("counters").document("transactions");
+
+        db.runTransaction(transaction -> {
+                    DocumentSnapshot senderSnap = transaction.get(senderRef);
+                    DocumentSnapshot recipientSnap = transaction.get(recipientRef);
+                    DocumentSnapshot counterSnap = transaction.get(counterRef);
+
+                    float senderBalance = Objects.requireNonNull(senderSnap.getDouble("wallet.balance")).floatValue();
+                    float recipientBalance = Objects.requireNonNull(recipientSnap.getDouble("wallet.balance")).floatValue();
+
+                    if (senderBalance < amount) {
+                        throw new IllegalArgumentException("Insufficient balance");
+                    }
+
+                    transaction.update(senderRef, "wallet.balance", senderBalance - amount);
+                    transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
+
+                    long nextValue = counterSnap.getLong("value") + 1;
+                    transaction.update(counterRef, "value", nextValue);
+
+                    String nextId = Long.toString(nextValue);
+
+                    Transaction txn = new Transaction()
+                            .withSenderId(senderRef.getId())
+                            .withReceiveId(recipientRef.getId())
+                            .withAmount(amount)
+                            .withDate(new GregorianCalendar());
+
+                    Map<String, Object> txnMap = new HashMap<>();
+                    txnMap.put("senderId", txn.senderId);
+                    txnMap.put("receiveId", txn.receiveId);
+                    txnMap.put("amount", txn.amount);
+                    txnMap.put("date", txn.date.getTime());
+
+                    DocumentReference txnRef = db.collection("transactions").document(nextId);
+                    transaction.set(txnRef, txnMap);
+
+                    return nextId;
+                })
+                .addOnSuccessListener(callback::onSuccess)
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<String> callback) {
+        FirebaseFirestore db = Database.db();
+        DocumentReference senderRef = db.collection("users").document(id);
+
+        getSender(id, new Database.Data<>() {
+            @Override
+            public void onSuccess(DocumentSnapshot senderSnapshot) {
+                Map<String, Object> senderDetails = (Map<String, Object>) senderSnapshot.get("details");
+
+                if (senderDetails == null) {
+                    callback.onFailure(new IllegalArgumentException("Sender 'details' field is missing from the document."));
+                    return;
+                }
+
+                String senderPhone = (String) senderDetails.get("phoneNumber");
+
+                if (senderPhone != null && senderPhone.equals(toPhone)) {
+                    callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
+                    return;
+                }
+
+                db.collection("users")
+                        .whereEqualTo("details.phoneNumber", toPhone)
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            if (querySnapshot.isEmpty()) {
+                                callback.onFailure(new Database.DataNotFound("Recipient not found"));
+                                return;
+                            }
+
+                            DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
+                            DocumentReference recipientRef = recipientSnapshot.getReference();
+
+                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
+                        })
+                        .addOnFailureListener(callback::onFailure);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<String> callback) {
+        if (id.equals(toUserId)) {
+            callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
+            return;
+        }
+
+        FirebaseFirestore db = Database.db();
+        DocumentReference senderRef = db.collection("users").document(id);
+        DocumentReference recipientRef = db.collection("users").document(toUserId);
+
+        getSender(id, new Database.Data<>() {
+            @Override
+            public void onSuccess(DocumentSnapshot senderSnapshot) {
+                recipientRef.get()
+                        .addOnSuccessListener(recipientSnapshot -> {
+                            if (!recipientSnapshot.exists()) {
+                                callback.onFailure(new Database.DataNotFound("Recipient not found"));
+                                return;
+                            }
+
+                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
+                        })
+                        .addOnFailureListener(callback::onFailure);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
     }
 
     public static <T extends Database.MapParser<T>> void get(String id, Class<T> clazz, Database.Data<T> callback) {
