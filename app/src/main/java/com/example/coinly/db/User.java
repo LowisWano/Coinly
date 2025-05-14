@@ -3,7 +3,6 @@ package com.example.coinly.db;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -193,9 +192,9 @@ public class User {
     }
 
     public static class Wallet implements Database.MapParser<Wallet> {
-        public float balance;
+        public double balance;
 
-        public Wallet withBalance(float balance) {
+        public Wallet withBalance(double balance) {
             this.balance = balance;
             return this;
         }
@@ -209,8 +208,13 @@ public class User {
             }
 
             Map<?, ?> data = (Map<?, ?>) rawData;
+            Object balance = data.get("balance");
 
-            this.balance = Float.parseFloat((String) Objects.requireNonNull(data.get("balance")));
+            if (balance instanceof Long) {
+                this.balance = ((Long) balance).doubleValue();
+            } else if (balance instanceof Double) {
+                this.balance = (Double) balance;
+            }
 
             return this;
         }
@@ -421,14 +425,18 @@ public class User {
             DocumentReference recipientRef,
             DocumentSnapshot recipientSnapshot,
             float amount,
-            Database.Data<Void> callback
+            Database.Data<String> callback
     ) {
         FirebaseFirestore db = Database.db();
         DocumentReference counterRef = db.collection("counters").document("transactions");
 
         db.runTransaction(transaction -> {
-                    float senderBalance = Objects.requireNonNull(senderSnapshot.getDouble("wallet.balance")).floatValue();
-                    float recipientBalance = Objects.requireNonNull(recipientSnapshot.getDouble("wallet.balance")).floatValue();
+                    DocumentSnapshot senderSnap = transaction.get(senderRef);
+                    DocumentSnapshot recipientSnap = transaction.get(recipientRef);
+                    DocumentSnapshot counterSnap = transaction.get(counterRef);
+
+                    float senderBalance = Objects.requireNonNull(senderSnap.getDouble("wallet.balance")).floatValue();
+                    float recipientBalance = Objects.requireNonNull(recipientSnap.getDouble("wallet.balance")).floatValue();
 
                     if (senderBalance < amount) {
                         throw new IllegalArgumentException("Insufficient balance");
@@ -437,9 +445,10 @@ public class User {
                     transaction.update(senderRef, "wallet.balance", senderBalance - amount);
                     transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
 
-                    DocumentSnapshot counterSnapshot = transaction.get(counterRef);
-                    long nextId = counterSnapshot.getLong("value") + 1;
-                    transaction.update(counterRef, "value", nextId);
+                    long nextValue = counterSnap.getLong("value") + 1;
+                    transaction.update(counterRef, "value", nextValue);
+
+                    String nextId = Long.toString(nextValue);
 
                     Transaction txn = new Transaction()
                             .withSenderId(senderRef.getId())
@@ -453,16 +462,16 @@ public class User {
                     txnMap.put("amount", txn.amount);
                     txnMap.put("date", txn.date.getTime());
 
-                    DocumentReference txnRef = db.collection("transactions").document(String.valueOf(nextId));
+                    DocumentReference txnRef = db.collection("transactions").document(nextId);
                     transaction.set(txnRef, txnMap);
 
-                    return null;
+                    return nextId;
                 })
-                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<Void> callback) {
+    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<String> callback) {
         FirebaseFirestore db = Database.db();
         DocumentReference senderRef = db.collection("users").document(id);
 
@@ -507,7 +516,7 @@ public class User {
         });
     }
 
-    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<Void> callback) {
+    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<String> callback) {
         if (id.equals(toUserId)) {
             callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
             return;
