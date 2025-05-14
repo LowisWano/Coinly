@@ -1,7 +1,9 @@
 package com.example.coinly.db;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -392,6 +394,104 @@ public class User {
                             "address.city", address.city
                     )
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void sendMoneyFromPhoneNumber(String id, String to, float amount, Database.Data<Void> callback) {
+        FirebaseFirestore db = Database.db();
+
+        DocumentReference senderRef = db.collection("users").document(id);
+        Query recipientQuery = db.collection("users").whereEqualTo("details.phoneNumber", to);
+
+        senderRef.get()
+                .addOnSuccessListener(senderSnapshot -> {
+                    if (!senderSnapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    Map<String, Object> senderDetails = (Map<String, Object>) senderSnapshot.get("details");
+                    String senderPhone = (String) senderDetails.get("phoneNumber");
+
+                    if (senderPhone != null && senderPhone.equals(to)) {
+                        callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
+                        return;
+                    }
+
+                    recipientQuery.get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                if (querySnapshot.isEmpty()) {
+                                    callback.onFailure(new Database.DataNotFound("Recipient not found"));
+                                    return;
+                                }
+
+                                DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
+                                DocumentReference recipientRef = recipientSnapshot.getReference();
+
+                                db.runTransaction(transaction -> {
+                                    float senderBalance = Objects.requireNonNull(senderSnapshot.getDouble("wallet.balance")).floatValue();
+                                    float recipientBalance = Objects.requireNonNull(recipientSnapshot.getDouble("wallet.balance")).floatValue();
+
+                                    if (senderBalance < amount) {
+                                        throw new IllegalArgumentException("Insufficient balance");
+                                    }
+
+                                    transaction.update(senderRef, "wallet.balance", senderBalance - amount);
+                                    transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
+
+                                    return null;
+                                })
+                                        .addOnSuccessListener(doc -> callback.onSuccess(null))
+                                        .addOnFailureListener(callback::onFailure);
+                            })
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void sendMoneyFromUserID(String id, String to, float amount, Database.Data<Void> callback) {
+        if (id.equals(to)) {
+            callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
+            return;
+        }
+
+        FirebaseFirestore db = Database.db();
+
+        DocumentReference senderRef = db.collection("users").document(id);
+        DocumentReference recipientRef = db.collection("users").document(to);
+
+        senderRef.get()
+                .addOnSuccessListener(senderSnapshot -> {
+                    if (!senderSnapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("Sender not found"));
+                        return;
+                    }
+
+                    recipientRef.get()
+                            .addOnSuccessListener(recipientSnapshot -> {
+                                if (!recipientSnapshot.exists()) {
+                                    callback.onFailure(new Database.DataNotFound("Recipient not found"));
+                                    return;
+                                }
+
+                                db.runTransaction(transaction -> {
+                                    float senderBalance = senderSnapshot.getDouble("wallet.balance").floatValue();
+                                    float recipientBalance = recipientSnapshot.getDouble("wallet.balance").floatValue();
+
+                                    if (senderBalance < amount) {
+                                        throw new IllegalArgumentException("Insufficient funds");
+                                    }
+
+                                    transaction.update(senderRef, "wallet.balance", senderBalance - amount);
+                                    transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
+
+                                    return null;
+                                })
+                                        .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                                        .addOnFailureListener(callback::onFailure);
+                            })
                             .addOnFailureListener(callback::onFailure);
                 })
                 .addOnFailureListener(callback::onFailure);
