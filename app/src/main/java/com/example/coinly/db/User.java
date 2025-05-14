@@ -2,7 +2,9 @@ package com.example.coinly.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 
 public class User {
@@ -170,6 +172,7 @@ public class User {
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
                         callback.onFailure(new Database.DataNotFound("Email not found"));
+                        return; // Important: stop execution here to prevent accessing empty result
                     }
 
                     // TODO: Implement here the decryption
@@ -179,6 +182,68 @@ public class User {
 
     }
 
+    public static void getBalance(Credentials credentials, Database.Balance callback) {
+        Database.db().collection("users")
+                .whereEqualTo("email", credentials.email)
+                .whereEqualTo("password", credentials.password)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    // Get the balance from the first document that matches
+                    Object balance = querySnapshot.getDocuments().get(0).get("balance");
+                    
+                    if (balance == null) {
+                        callback.onFailure(new Database.DataNotFound("Balance not found"));
+                        return;
+                    }
+
+                    try {
+                        // Convert the balance to float
+                        float balanceValue = 0f;
+                        if (balance instanceof Double) {
+                            balanceValue = ((Double) balance).floatValue();
+                        } else if (balance instanceof Long) {
+                            balanceValue = ((Long) balance).floatValue();
+                        } else if (balance instanceof String) {
+                            balanceValue = Float.parseFloat((String) balance);
+                        }
+
+                        callback.onSuccess(balanceValue);
+                    } catch (Exception e) {
+                        callback.onFailure(new Exception("Error parsing balance: " + e.getMessage()));
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void getTransactions(Credentials credentials, Database.Data<List<Map<String, Object>>> callback) {
+        Database.db().collection("users")
+                .whereEqualTo("email", credentials.email)
+                .whereEqualTo("password", credentials.password)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    // Get the transactions from the first document that matches
+                    List<Map<String, Object>> transactions = (List<Map<String, Object>>) querySnapshot.getDocuments().get(0).get("transactions");
+                    
+                    if (transactions == null || transactions.isEmpty()) {
+                        callback.onSuccess(new ArrayList<>()); // Return empty list if no transactions
+                        return;
+                    }
+
+                    callback.onSuccess(transactions);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+    
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
         Database.db().collection("users")
                 .document(id)

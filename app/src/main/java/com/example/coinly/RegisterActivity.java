@@ -14,6 +14,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.example.coinly.db.User;
+import com.example.coinly.db.Database;
+import java.util.GregorianCalendar;
+
 public class RegisterActivity extends AppCompatActivity {
 
     // UI components
@@ -76,19 +80,81 @@ public class RegisterActivity extends AppCompatActivity {
     private void setupListeners() {
         btnRegister.setOnClickListener(v -> {
             if (validateInputs()) {
-                // In a real app, this would connect to a backend service to register the user
-                // For now, we'll just display a success toast and navigate to the PIN creation page
+                // Create user credentials and details objects
+                String email = etEmail.getText().toString().trim();
+                String password = etPassword.getText().toString().trim();
+                String phoneNumber = etPhoneNumber.getText().toString().trim();
+                String firstName = etFirstName.getText().toString().trim();
+                String lastName = etLastName.getText().toString().trim();
+                char middleInitial = etMiddleInitial.getText().toString().isEmpty() ? ' ' : 
+                                      etMiddleInitial.getText().toString().charAt(0);
                 
-                Toast.makeText(this, R.string.registration_success, Toast.LENGTH_SHORT).show();
+                int day = Integer.parseInt(etDay.getText().toString().trim());
+                int month = Integer.parseInt(etMonth.getText().toString().trim()) - 1; // Calendar months are 0-based
+                int year = Integer.parseInt(etYear.getText().toString().trim());
                 
-                // Navigate to PIN creation activity
-                Intent intent = new Intent(RegisterActivity.this, CreatePinActivity.class);
-                startActivity(intent);
+                // Create a GregorianCalendar for birthdate
+                GregorianCalendar birthdate = new GregorianCalendar(year, month, day);
                 
-                // Apply slide up animation for the transition
-                overridePendingTransition(R.anim.slide_up, R.anim.no_change);
+                // Create User objects
+                User.Credentials credentials = new User.Credentials()
+                    .withEmail(email)
+                    .withPassword(password);
                 
-                finish(); // Close register activity
+                User.Details.FullName fullName = new User.Details.FullName()
+                    .withFirst(firstName)
+                    .withLast(lastName)
+                    .withMiddleInitial(middleInitial);
+                
+                User.Details details = new User.Details()
+                    .withPhoneNumber(phoneNumber)
+                    .withFullName(fullName)
+                    .withBirthdate(birthdate);
+                
+                // Show loading indicator
+                findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
+                btnRegister.setEnabled(false);
+                
+                // Save user to Firebase
+                User.signUp(credentials, details, new Database.Data<String>() {
+                    @Override
+                    public void onSuccess(String userId) {
+                        // Hide loading indicator
+                        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+                        
+                        // Store user ID in shared preferences for future use
+                        getSharedPreferences("coinly", MODE_PRIVATE)
+                            .edit()
+                            .putString("userId", userId)
+                            .apply();
+                        
+                        Toast.makeText(RegisterActivity.this, R.string.registration_success, Toast.LENGTH_SHORT).show();
+                        
+                        // Navigate to PIN creation activity
+                        Intent intent = new Intent(RegisterActivity.this, CreatePinActivity.class);
+                        intent.putExtra("userId", userId);
+                        startActivity(intent);
+                        
+                        // Apply slide up animation for the transition
+                        overridePendingTransition(R.anim.slide_up, R.anim.no_change);
+                        
+                        finish(); // Close register activity
+                    }
+                    
+                    @Override
+                    public void onFailure(Exception e) {
+                        // Hide loading indicator
+                        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+                        btnRegister.setEnabled(true);
+                        
+                        String errorMessage = "Registration failed";
+                        if (e instanceof Database.KeyAlreadyExists) {
+                            errorMessage = "Email already exists";
+                        }
+                        
+                        Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 
