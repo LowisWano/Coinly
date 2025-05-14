@@ -3,7 +3,6 @@ package com.example.coinly.db;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -193,9 +192,9 @@ public class User {
     }
 
     public static class Wallet implements Database.MapParser<Wallet> {
-        public float balance;
+        public double balance;
 
-        public Wallet withBalance(float balance) {
+        public Wallet withBalance(double balance) {
             this.balance = balance;
             return this;
         }
@@ -209,8 +208,13 @@ public class User {
             }
 
             Map<?, ?> data = (Map<?, ?>) rawData;
+            Object balance = data.get("balance");
 
-            this.balance = (float) Objects.requireNonNull(data.get("balance"));
+            if (balance instanceof Long) {
+                this.balance = ((Long) balance).doubleValue();
+            } else if (balance instanceof Double) {
+                this.balance = (Double) balance;
+            }
 
             return this;
         }
