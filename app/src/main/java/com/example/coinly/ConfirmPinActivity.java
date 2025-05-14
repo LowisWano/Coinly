@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.coinly.db.User;
+import com.example.coinly.db.Database;
+
 public class ConfirmPinActivity extends AppCompatActivity {
 
     private TextView[] pinDigits;
@@ -22,14 +25,31 @@ public class ConfirmPinActivity extends AppCompatActivity {
     private ImageButton btnBackspace;
     private StringBuilder pinBuilder = new StringBuilder();
     private String originalPin;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm_pin);
 
-        // Get the PIN from the previous activity
+        // Get the PIN and userId from the previous activity
         originalPin = getIntent().getStringExtra("pin");
+        userId = getIntent().getStringExtra("userId");
+        
+        // If userId is not passed, try to get from shared preferences
+        if (userId == null) {
+            userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", null);
+        }
+        
+        if (userId == null || originalPin == null) {
+            // Required data missing, redirect to login
+            Toast.makeText(this, "Session expired. Please login again.", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
         
         // Initialize views
         initializeViews();
@@ -116,19 +136,48 @@ public class ConfirmPinActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(v -> {
             // Add null check to prevent NullPointerException
             if (originalPin != null && originalPin.equals(pinBuilder.toString())) {
-                // PINs match
-                Toast.makeText(this, R.string.pin_success, Toast.LENGTH_SHORT).show();
+                // PINs match - save to database
+                btnConfirm.setEnabled(false);
+                findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
                 
-                new Handler().postDelayed(() -> {
-                    Intent intent = new Intent(ConfirmPinActivity.this, WalletActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                // Create credentials with PIN
+                User.Credentials credentials = new User.Credentials()
+                    .withPin(originalPin.toCharArray());
+                
+                // Store the PIN in the database
+                User.setPin(userId, credentials, new Database.Data<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        // Hide loading indicator
+                        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+                        
+                        // PIN saved successfully
+                        Toast.makeText(ConfirmPinActivity.this, R.string.pin_success, Toast.LENGTH_SHORT).show();
+                        
+                        new Handler().postDelayed(() -> {
+                            Intent intent = new Intent(ConfirmPinActivity.this, WalletActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            
+                            // Apply slide up animation
+                            overridePendingTransition(R.anim.slide_up, R.anim.no_change);
+                            
+                            finish();
+                        }, 1500);
+                    }
                     
-                    // Apply slide up animation
-                    overridePendingTransition(R.anim.slide_up, R.anim.no_change);
-                    
-                    finish();
-                }, 1500);
+                    @Override
+                    public void onFailure(Exception e) {
+                        // Hide loading indicator
+                        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+                        
+                        // Failed to save PIN
+                        btnConfirm.setEnabled(true);
+                        Toast.makeText(ConfirmPinActivity.this, 
+                            "Failed to save PIN: " + e.getMessage(), 
+                            Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 // PINs don't match
                 tvPinError.setVisibility(View.VISIBLE);

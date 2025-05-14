@@ -8,8 +8,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.coinly.db.User;
+import com.example.coinly.db.Database;
 
 public class CreatePinActivity extends AppCompatActivity {
 
@@ -18,11 +22,28 @@ public class CreatePinActivity extends AppCompatActivity {
     private Button btnNext;
     private ImageButton btnBackspace;
     private StringBuilder pinBuilder = new StringBuilder();
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_pin);
+        
+        // Get user ID from intent or shared preferences
+        userId = getIntent().getStringExtra("userId");
+        if (userId == null) {
+            userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", null);
+        }
+        
+        if (userId == null) {
+            // No userId found, redirect to login
+            Toast.makeText(this, "Session expired. Please login again.", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         // Initialize views
         initializeViews();
@@ -101,9 +122,10 @@ public class CreatePinActivity extends AppCompatActivity {
 
     private void setupNextButton() {
         btnNext.setOnClickListener(v -> {
-            // Pass the created PIN to the confirm PIN activity
+            // Pass the created PIN and userId to the confirm PIN activity
             Intent intent = new Intent(CreatePinActivity.this, ConfirmPinActivity.class);
             intent.putExtra("pin", pinBuilder.toString());
+            intent.putExtra("userId", userId);
             startActivity(intent);
             
             // Apply slide animation
