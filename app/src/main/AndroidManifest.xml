@@ -21,6 +21,10 @@
             android:name=".PocketActivity"
             android:exported="false" />
         <activity
+        <activity
+            android:name=".HelpActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
@@ -34,6 +38,8 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
+
+            android:exported="false"></activity>
             android:exported="true"><intent-filter>
             <action android:name="android.intent.action.MAIN" />
 

@@ -57,7 +57,7 @@
     <string name="birthdate_label">Birthdate</string>
     <string name="birthdate_value">Aug 21, 2002</string>
     <string name="email_label">Email Address</string>
-    <string name="email_value">bayotkolol@gmail.com</string>
+    <string name="email_value">johndoe@gmail.com</string>
     <string name="address_label">Current Address</string>
     <string name="address_value">Kilid sa Jollibee, Talamban, Cebu City, 6000</string>
     <string name="update_account">Update Account Information</string>
