@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -14,12 +15,17 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.example.coinly.db.Database;
+import com.example.coinly.db.User;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class RequestTransactionHistoryActivity extends AppCompatActivity {
+public class RequestTransactionHistoryActivity extends AppCompatActivity implements Database.Data<User.Credentials> {
     private Spinner dateRangeSpinner;
+    private TextView emailText;
     private TextView fromDateText;
     private TextView toDateText;
     private Button submitButton;
@@ -58,12 +64,19 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         fromDateText = findViewById(R.id.fromDateText);
         toDateText = findViewById(R.id.toDateText);
         submitButton = findViewById(R.id.submitButton);
+        emailText = findViewById(R.id.emailText);
 
         // Set current date as default
         fromDateText.setText(dateFormat.format(fromDate.getTime()));
         toDateText.setText(dateFormat.format(toDate.getTime()));
 
         submitButton.setOnClickListener(v -> showSuccessDialog());
+
+        User.get(
+                getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", ""),
+                User.Credentials.class,
+                this
+        );
     }
 
     private void setupDateRangeSpinner() {
@@ -201,5 +214,16 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onSuccess(User.Credentials data) {
+        emailText.setText(data.email);
+    }
+
+    @Override
+    public void onFailure(Exception e) {
+        Log.e("Credentials", "unable to get user credentials", e);
+        finish();
     }
 }
