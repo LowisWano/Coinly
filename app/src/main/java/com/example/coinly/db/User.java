@@ -1,10 +1,12 @@
 package com.example.coinly.db;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,15 @@ public class User {
             public String first;
             public String last;
             public char middleInitial;
+
+            public String formatted() {
+                return String.format(
+                        "%s %s%s",
+                        this.first,
+                        (this.middleInitial != '\0') ? this.middleInitial + ". " : "",
+                        this.last
+                );
+            }
 
             public FullName withFirst(String first) {
                 this.first = first;
@@ -129,16 +140,11 @@ public class User {
             this.phoneNumber = (String) data.get("phoneNumber");
             this.fullName = new FullName().parser(data);
 
-            Object birthdateObj = data.get("birthdate");
+            Object birthdate = data.get("birthdate");
 
-            if (birthdateObj instanceof Map<?, ?>) {
-                Map<?, ?> birthMap = (Map<?, ?>) birthdateObj;
-
-                int year = ((Number) Objects.requireNonNull(birthMap.get("year"))).intValue();
-                int month = ((Number) Objects.requireNonNull(birthMap.get("month"))).intValue();
-                int day = ((Number) Objects.requireNonNull(birthMap.get("day"))).intValue();
-
-                this.birthdate = new GregorianCalendar(year, month, day);
+            if (birthdate instanceof Timestamp) {
+                this.birthdate = new GregorianCalendar();
+                this.birthdate.setTime(((Timestamp) birthdate).toDate());
             }
 
             return this;
@@ -219,27 +225,6 @@ public class User {
         }
     }
 
-    public static class Savings {
-        public String name;
-        public float target;
-        public float balance;
-
-        public Savings withName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Savings withTarget(float target) {
-            this.target = target;
-            return this;
-        }
-
-        public Savings withBalance(float balance) {
-            this.balance = balance;
-            return this;
-        }
-    }
-
     public static void signUp(Credentials credentials, Details details, Database.Data<String> callback) {
         Map<String, Object> user = Map.of(
                 "credentials", Map.of(
@@ -310,7 +295,7 @@ public class User {
 
                     // Get the balance from the first document that matches
                     Object balance = querySnapshot.getDocuments().get(0).get("balance");
-                    
+
                     if (balance == null) {
                         callback.onFailure(new Database.DataNotFound("Balance not found"));
                         return;
@@ -348,7 +333,7 @@ public class User {
 
                     // Get the transactions from the first document that matches
                     List<Map<String, Object>> transactions = (List<Map<String, Object>>) querySnapshot.getDocuments().get(0).get("transactions");
-                    
+
                     if (transactions == null || transactions.isEmpty()) {
                         callback.onSuccess(new ArrayList<>()); // Return empty list if no transactions
                         return;
@@ -358,7 +343,7 @@ public class User {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
-    
+
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
         DocumentReference docRef = Database.db().collection("users").document(id);
 
@@ -390,14 +375,15 @@ public class User {
                             "credentials.password", credentials.password,
                             "details.fullName.first", details.fullName.first,
                             "details.fullName.last", details.fullName.last,
-                            "details.fullName.middleInitial", Character.toString(details.fullName.middleInitial),
+                            "details.fullname.middleInitial", Character.toString(details.fullName.middleInitial),
                             "details.phoneNumber", details.phoneNumber,
                             "details.birthdate", details.birthdate.getTime(),
                             "address.street", address.street,
                             "address.barangay", address.barangay,
-                            "address.zipCode", address.zipCode,
-                            "address.city", address.city
-                    )
+                            "address.city", address.city,
+                            "address.zipCode", address.zipCode
+                            )
+
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
                             .addOnFailureListener(callback::onFailure);
                 })

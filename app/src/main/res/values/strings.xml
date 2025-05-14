@@ -35,9 +35,11 @@
     <string name="confirm_pin">Confirm PIN</string>
     <string name="pin_description">Please create a 4-digit PIN that will be used to secure your account</string>
     <string name="confirm_pin_description">Please re-enter your PIN to confirm</string>
+    <string name="pin_edit_description">Please enter your old PIN</string>
     <string name="pin_mismatch">PINs do not match. Please try again.</string>
     <string name="pin_success">PIN successfully created!</string>
     <string name="next">Next</string>
+    <string name="cancel">Cancel"</string>
     <string name="confirm">Confirm</string>
     <string name="backspace">Delete</string>
     <string name="fingerprint">Fingerprint</string>
@@ -57,7 +59,7 @@
     <string name="birthdate_label">Birthdate</string>
     <string name="birthdate_value">Aug 21, 2002</string>
     <string name="email_label">Email Address</string>
-    <string name="email_value">bayotkolol@gmail.com</string>
+    <string name="email_value">johndoe@gmail.com</string>
     <string name="address_label">Current Address</string>
     <string name="address_value">Kilid sa Jollibee, Talamban, Cebu City, 6000</string>
     <string name="update_account">Update Account Information</string>

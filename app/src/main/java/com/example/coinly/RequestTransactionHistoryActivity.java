@@ -5,22 +5,30 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.example.coinly.db.Database;
+import com.example.coinly.db.User;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class RequestTransactionHistoryActivity extends AppCompatActivity {
+public class RequestTransactionHistoryActivity extends AppCompatActivity implements Database.Data<User.Credentials> {
     private Spinner dateRangeSpinner;
+    private TextView emailText;
     private TextView fromDateText;
     private TextView toDateText;
+    private Button submitButton;
     private Calendar fromDate = Calendar.getInstance();
     private Calendar toDate = Calendar.getInstance();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
@@ -42,7 +50,6 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         initializeViews();
         setupDateRangeSpinner();
         setupDatePickers();
-        setupSubmitButton();
     }
 
     private void setupToolbar() {
@@ -56,10 +63,20 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         dateRangeSpinner = findViewById(R.id.dateRangeSpinner);
         fromDateText = findViewById(R.id.fromDateText);
         toDateText = findViewById(R.id.toDateText);
+        submitButton = findViewById(R.id.submitButton);
+        emailText = findViewById(R.id.emailText);
 
         // Set current date as default
         fromDateText.setText(dateFormat.format(fromDate.getTime()));
         toDateText.setText(dateFormat.format(toDate.getTime()));
+
+        submitButton.setOnClickListener(v -> showSuccessDialog());
+
+        User.get(
+                getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", ""),
+                User.Credentials.class,
+                this
+        );
     }
 
     private void setupDateRangeSpinner() {
@@ -74,6 +91,8 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         dateRangeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                submitButton.setEnabled(position != 0);
+
                 switch (position) {
                     case 1: // Last 7 days
                         setDateRange(7);
@@ -174,12 +193,6 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void setupSubmitButton() {
-        findViewById(R.id.submitButton).setOnClickListener(v -> {
-            showSuccessDialog();
-        });
-    }
-
     private void showSuccessDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_request_success);
@@ -201,5 +214,16 @@ public class RequestTransactionHistoryActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onSuccess(User.Credentials data) {
+        emailText.setText(data.email);
+    }
+
+    @Override
+    public void onFailure(Exception e) {
+        Log.e("Credentials", "unable to get user credentials", e);
+        finish();
     }
 }
