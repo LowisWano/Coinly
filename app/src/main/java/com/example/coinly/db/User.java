@@ -170,6 +170,7 @@ public class User {
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
                         callback.onFailure(new Database.DataNotFound("Email not found"));
+                        return;
                     }
 
                     // TODO: Implement here the decryption
