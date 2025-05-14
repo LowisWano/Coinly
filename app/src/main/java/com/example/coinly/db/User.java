@@ -4,6 +4,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -196,7 +197,7 @@ public class User {
 
                     // Get the balance from the first document that matches
                     Object balance = querySnapshot.getDocuments().get(0).get("balance");
-                    
+
                     if (balance == null) {
                         callback.onFailure(new Database.DataNotFound("Balance not found"));
                         return;
@@ -234,7 +235,7 @@ public class User {
 
                     // Get the transactions from the first document that matches
                     List<Map<String, Object>> transactions = (List<Map<String, Object>>) querySnapshot.getDocuments().get(0).get("transactions");
-                    
+
                     if (transactions == null || transactions.isEmpty()) {
                         callback.onSuccess(new ArrayList<>()); // Return empty list if no transactions
                         return;
@@ -244,7 +245,7 @@ public class User {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
-    
+
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
         DocumentReference docRef = Database.db().collection("users").document(id);
 
@@ -262,7 +263,7 @@ public class User {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void updateDetails(String id, Credentials credentials, Details details, Database.Data<Void> callback) {
+    public static void updateDetails(String id, Credentials credentials, Details details, Address address, Database.Data<Void> callback) {
         DocumentReference docRef = Database.db().collection("users").document(id);
 
         docRef.get()
@@ -276,9 +277,14 @@ public class User {
                             "credentials.password", credentials.password,
                             "details.fullName.first", details.fullName.first,
                             "details.fullName.last", details.fullName.last,
-                            "details.fullName.middleInitial", details.fullName.middleInitial,
-                            "details.phoneNumber", details.phoneNumber
-                    )
+                            "details.fullname.middleInitial", Character.toString(details.fullName.middleInitial),
+                            "details.phoneNumber", details.phoneNumber,
+                            "details.birthdate", details.birthdate.getTime(),
+                            "address.street", address.street,
+                            "address.barangay", address.barangay,
+                            "address.city", address.city,
+                            "address.zipCode", address.zipCode
+                            )
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
                             .addOnFailureListener(callback::onFailure);
                 })
