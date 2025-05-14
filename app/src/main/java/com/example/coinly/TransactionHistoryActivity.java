@@ -4,19 +4,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.example.coinly.db.User;
+import com.example.coinly.db.Database;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class TransactionHistoryActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -60,59 +68,122 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         });
     }
 
+    private static final String TAG = "TransactionHistory";
+
     private void loadTransactions() {
-        // TODO: Replace with actual data loading from database/API
         allTransactions = new ArrayList<>();
-        allTransactions.add(new Transaction(
-            "Netflix Subscription", 
-            "January 27, 2025", 
-            -300.00,
-            "NF27012025",
-            "Your Wallet",
-            "Netflix, Inc."
-        ));
-        allTransactions.add(new Transaction(
-            "Youtube Premium", 
-            "January 26, 2025", 
-            -239.00,
-            "YT26012025",
-            "Your Wallet",
-            "Google LLC"
-        ));
-        allTransactions.add(new Transaction(
-            "24 Chicken", 
-            "January 23, 2025", 
-            45.00,
-            "24C23012025",
-            "24 Chicken",
-            "Your Wallet"
-        ));
-        allTransactions.add(new Transaction(
-            "Burp", 
-            "January 15, 2025", 
-            19.00,
-            "BP15012025",
-            "Burp App",
-            "Your Wallet"
-        ));
-
-        // Calculate current balance
-        currentBalance = 0.0;
-        for (Transaction transaction : allTransactions) {
-            currentBalance += transaction.getAmount();
-        }
-
-        // Update balance display
-        balanceText.setText(String.format("₱ %,.2f", Math.abs(currentBalance)));
-
-        // Update filtered transactions
-        filteredTransactions.clear();
-        filteredTransactions.addAll(allTransactions);
-        adapter.notifyDataSetChanged();
         
-        // Update the transaction count text
-        TextView transactionCount = findViewById(R.id.transactionCount);
-        transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
+        String email = "destin@gmail.com";
+        String password = "password";
+        
+        // Create credentials object
+        User.Credentials credentials = new User.Credentials()
+                .withEmail(email)
+                .withPassword(password);
+        
+        // Show loading state
+        Toast.makeText(this, "Loading transactions...", Toast.LENGTH_SHORT).show();
+        
+        // Call getTransactions method
+        User.getTransactions(credentials, new Database.Data<List<Map<String, Object>>>() {
+            @Override
+            public void onSuccess(List<Map<String, Object>> transactions) {
+                // Process transactions data
+                for (Map<String, Object> transaction : transactions) {
+                    String name = (String) transaction.get("name");
+                    
+                    // Get date as timestamp and format it
+                    Date date = transaction.get("date") instanceof com.google.firebase.Timestamp ? 
+                            ((com.google.firebase.Timestamp) transaction.get("date")).toDate() : new Date();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
+                    String formattedDate = dateFormat.format(date);
+                    
+                    // Get amount and refNum
+                    double amount = transaction.get("amount") instanceof Number ? 
+                            ((Number) transaction.get("amount")).doubleValue() : 0.0;
+                    String refNum = (String) transaction.get("refNum");
+                    
+                    // Add transaction to list
+                    allTransactions.add(new Transaction(name, formattedDate, amount, refNum, "Your Wallet", name));
+                }
+
+                // Calculate current balance
+                currentBalance = 0.0;
+                for (Transaction transaction : allTransactions) {
+                    currentBalance += transaction.getAmount();
+                }
+
+                // Update the UI on the main thread
+                runOnUiThread(() -> {
+                    // Update balance display
+                    balanceText.setText(String.format("₱ %,.2f", Math.abs(currentBalance)));
+
+                    // Update filtered transactions
+                    filteredTransactions.clear();
+                    filteredTransactions.addAll(allTransactions);
+                    adapter.notifyDataSetChanged();
+                    
+                    // Update the transaction count text
+                    TextView transactionCount = findViewById(R.id.transactionCount);
+                    transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
+                });
+            }
+            
+            @Override
+            public void onFailure(Exception e) {
+                // Handle error
+                Log.e(TAG, "Failed to fetch transactions", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(TransactionHistoryActivity.this, 
+                            "Could not retrieve transactions: " + e.getMessage(), 
+                            Toast.LENGTH_SHORT).show();
+                    
+                    // Use fallback data for demo purposes
+                    allTransactions.add(new Transaction(
+                        "Netflix Subscription", 
+                        "January 27, 2025", 
+                        -300.00,
+                        "NF27012025",
+                        "Your Wallet",
+                        "Netflix, Inc."
+                    ));
+                    allTransactions.add(new Transaction(
+                        "Youtube Premium", 
+                        "January 26, 2025", 
+                        -239.00,
+                        "YT26012025",
+                        "Your Wallet",
+                        "Google LLC"
+                    ));
+                    allTransactions.add(new Transaction(
+                        "24 Chicken", 
+                        "January 23, 2025", 
+                        45.00,
+                        "24C23012025",
+                        "24 Chicken",
+                        "Your Wallet"
+                    ));
+                    
+                    // Calculate current balance
+                    currentBalance = 0.0;
+                    for (Transaction transaction : allTransactions) {
+                        currentBalance += transaction.getAmount();
+                    }
+                    
+                    // Update balance display
+                    balanceText.setText(String.format("₱ %,.2f", Math.abs(currentBalance)));
+                    
+                    // Update filtered transactions
+                    filteredTransactions.clear();
+                    filteredTransactions.addAll(allTransactions);
+                    adapter.notifyDataSetChanged();
+                    
+                    // Update the transaction count text
+                    TextView transactionCount = findViewById(R.id.transactionCount);
+                    transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
+                });
+            }
+        });
     }
 
     private void setupSearch() {
