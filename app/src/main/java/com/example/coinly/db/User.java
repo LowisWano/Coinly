@@ -419,7 +419,7 @@ public class User {
             DocumentReference recipientRef,
             DocumentSnapshot recipientSnapshot,
             float amount,
-            Database.Data<Void> callback
+            Database.Data<String> callback
     ) {
         FirebaseFirestore db = Database.db();
         DocumentReference counterRef = db.collection("counters").document("transactions");
@@ -436,7 +436,7 @@ public class User {
                     transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
 
                     DocumentSnapshot counterSnapshot = transaction.get(counterRef);
-                    long nextId = counterSnapshot.getLong("value") + 1;
+                    String nextId = Long.toString(counterSnapshot.getLong("value") + 1);
                     transaction.update(counterRef, "value", nextId);
 
                     Transaction txn = new Transaction()
@@ -451,16 +451,16 @@ public class User {
                     txnMap.put("amount", txn.amount);
                     txnMap.put("date", txn.date.getTime());
 
-                    DocumentReference txnRef = db.collection("transactions").document(String.valueOf(nextId));
+                    DocumentReference txnRef = db.collection("transactions").document(nextId);
                     transaction.set(txnRef, txnMap);
 
-                    return null;
+                    return nextId;
                 })
-                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnSuccessListener(id -> callback.onSuccess(id))
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<Void> callback) {
+    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<String> callback) {
         FirebaseFirestore db = Database.db();
         DocumentReference senderRef = db.collection("users").document(id);
 
@@ -505,7 +505,7 @@ public class User {
         });
     }
 
-    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<Void> callback) {
+    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<String> callback) {
         if (id.equals(toUserId)) {
             callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
             return;
