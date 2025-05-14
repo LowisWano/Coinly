@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.coinly.db.Pocket;
 import com.example.coinly.db.Transaction;
 import com.example.coinly.db.User;
 import com.example.coinly.db.Database;
@@ -49,7 +50,6 @@ public class WalletActivity extends AppCompatActivity {
             fetchUserBalance();
             loadPocketData();
             loadTransactionData();
-            setupPocketsRecyclerView();
             setupBottomNavigation();
             setupSeeAllButtons();
         } catch (Exception e) {
@@ -96,10 +96,18 @@ public class WalletActivity extends AppCompatActivity {
     }
 
     private void loadPocketData() {
-        // In a real app, this data would come from a database or API
-        pocketsList = new ArrayList<>();
-        pocketsList.add(new Pocket("Home", 50000.00, 43000.00, R.drawable.ic_home, false));
-        pocketsList.add(new Pocket("Motorcycle", 120000.00, 24000.00, R.drawable.ic_motorcycle, true));
+        Pocket.get(userId, new Database.Data<List<Pocket>>() {
+            @Override
+            public void onSuccess(List<Pocket> data) {
+                pocketsList = data;
+                setupPocketsRecyclerView();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("Wallet", "Tried to get user's pockets", e);
+            }
+        });
     }
 
     private void loadTransactionData() {
@@ -124,7 +132,7 @@ public class WalletActivity extends AppCompatActivity {
             
             pocketAdapter = new PocketAdapter(pocketsList, (pocket, position) -> {
                 // Handle pocket item click
-                Toast.makeText(this, pocket.getName() + " pocket clicked", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, pocket.name + " pocket clicked", Toast.LENGTH_SHORT).show();
                 // Navigate to pocket details in a real app
             });
 
@@ -200,7 +208,7 @@ public class WalletActivity extends AppCompatActivity {
                 new Database.Data<User.Wallet>() {
                     @Override
                     public void onSuccess(User.Wallet data) {
-                        actualBalance = String.format("Php %.2f", data.balance);
+                        actualBalance = String.format("Php %s", Util.amountFormatter(data.balance));
 
                         if (!isBalanceHidden) {
                             balanceAmount.setText(actualBalance);

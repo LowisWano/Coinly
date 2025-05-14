@@ -40,22 +40,15 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             return;
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-        
         holder.titleText.setText(transaction.name);
-        holder.dateText.setText(formatter.format(transaction.date.getTime()));
+        holder.dateText.setText(Util.dateFormatter(transaction.date));
         holder.amountText.setText(transaction.formattedAmount());
         holder.amountText.setTextColor(transaction.amountColor());
         holder.referenceText.setText("Ref Number: " + transaction.id);
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, TransactionDetailsActivity.class);
-            intent.putExtra(TransactionDetailsActivity.EXTRA_TITLE, transaction.name);
-            intent.putExtra(TransactionDetailsActivity.EXTRA_DATE, transaction.date);
-            intent.putExtra(TransactionDetailsActivity.EXTRA_AMOUNT, transaction.amount);
-            intent.putExtra(TransactionDetailsActivity.EXTRA_REFERENCE, transaction.id);
-            intent.putExtra(TransactionDetailsActivity.EXTRA_SENDER, transaction.senderId);
-            intent.putExtra(TransactionDetailsActivity.EXTRA_RECEIVER, transaction.receiveId);
+            intent.putExtra("id", transaction.id);
             context.startActivity(intent);
         });
     }

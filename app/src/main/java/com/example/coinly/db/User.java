@@ -225,27 +225,6 @@ public class User {
         }
     }
 
-    public static class Savings {
-        public String name;
-        public float target;
-        public float balance;
-
-        public Savings withName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Savings withTarget(float target) {
-            this.target = target;
-            return this;
-        }
-
-        public Savings withBalance(float balance) {
-            this.balance = balance;
-            return this;
-        }
-    }
-
     public static void signUp(Credentials credentials, Details details, Database.Data<String> callback) {
         Map<String, Object> user = Map.of(
                 "credentials", Map.of(

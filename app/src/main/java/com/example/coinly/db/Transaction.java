@@ -2,6 +2,7 @@ package com.example.coinly.db;
 
 import android.util.Log;
 
+import com.example.coinly.Util;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
@@ -35,9 +36,9 @@ public class Transaction implements Database.MapParser<Transaction> {
 
     public String formattedAmount() {
         return String.format(
-                "%c Php %.2f",
+                "%c Php %s",
                 (this.type == Type.Transfer) ? '-' : '+',
-                this.amount
+                Util.amountFormatter(this.amount)
         );
     }
 
@@ -139,6 +140,28 @@ public class Transaction implements Database.MapParser<Transaction> {
                     }
 
                     callback.onSuccess(all);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void getFrom(String id, Database.Data<Transaction> callback) {
+        Database.db().collection("transactions")
+                .document(id)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        callback.onFailure(new Database.DataNotFound("Transaction not found"));
+                        return;
+                    }
+
+                    Map<String, Object> data = doc.getData();
+
+                    if (data == null){
+                        callback.onFailure(new Database.DataNotFound("Transaction not found"));
+                        return;
+                    }
+
+                    callback.onSuccess(new Transaction().parser(data));
                 })
                 .addOnFailureListener(callback::onFailure);
     }

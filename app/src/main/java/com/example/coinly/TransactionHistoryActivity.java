@@ -86,7 +86,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
                 new Database.Data<User.Wallet>() {
                     @Override
                     public void onSuccess(User.Wallet data) {
-                        ((TextView) findViewById(R.id.balanceText)).setText(String.format("%.2f", data.balance));
+                        ((TextView) findViewById(R.id.balanceText)).setText(Util.amountFormatter(data.balance));
                     }
 
                     @Override
