@@ -75,7 +75,6 @@ public class PocketDetailsActivity extends AppCompatActivity {
         
         // Ensure back button is properly styled
         if (backButton != null) {
-            Toast.makeText(this, "Back button initialized", Toast.LENGTH_SHORT).show();
             backButton.setClickable(true);
             backButton.setFocusable(true);
         } else {
@@ -114,9 +113,7 @@ public class PocketDetailsActivity extends AppCompatActivity {
     }
     
     private void navigateToPocketsScreen() {
-        Toast.makeText(this, "Navigating to pockets screen", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(PocketDetailsActivity.this, PocketActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear the activity stack
         startActivity(intent);
         finish(); // Close this activity
     }
@@ -124,7 +121,6 @@ public class PocketDetailsActivity extends AppCompatActivity {
     private void setupClickListeners() {
         // Set back button click listener
         backButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Back button clicked", Toast.LENGTH_SHORT).show();
             navigateToPocketsScreen();
         });
         
