@@ -36,7 +36,6 @@ public class PocketActivity extends AppCompatActivity {
         
         initViews();
         loadPocketData();
-        setupPocketsRecyclerView();
         setupBottomNavigation();
     }
     
@@ -61,11 +60,12 @@ public class PocketActivity extends AppCompatActivity {
     }
     
     private void loadPocketData() {
-        String userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", null);
+        String userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
 
         Pocket.get(userId, new Database.Data<List<Pocket>>() {
             @Override
             public void onSuccess(List<Pocket> data) {
+                Log.i("Pocket", "Successfully retrieved pocket list");
                 pocketsList = data;
                 setupPocketsRecyclerView();
             }
