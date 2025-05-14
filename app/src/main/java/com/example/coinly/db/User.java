@@ -197,6 +197,27 @@ public class User {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
+
+    public static void updateDetails(String id, Credentials credentials, Details details, Database.Data<Void> callback) {
+        DocumentReference docRef = Database.db().collection("users").document(id);
+
+        docRef.get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    docRef.update(
+                            "credentials.password", credentials.password,
+                            "details.fullName.first", details.fullName.first,
+                            "details.fullName.last", details.fullName.last,
+                            "details.fullName.middleInitial", details.fullName.middleInitial,
+                            "details.phoneNumber", details.phoneNumber
+                    )
+                            .addOnSuccessListener(doc -> callback.onSuccess(null))
+                            .addOnFailureListener(callback::onFailure);
+                })
                 .addOnFailureListener(callback::onFailure);
     }
 }
