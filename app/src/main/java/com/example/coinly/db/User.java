@@ -1,5 +1,6 @@
 package com.example.coinly.db;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -172,7 +173,7 @@ public class User {
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
                         callback.onFailure(new Database.DataNotFound("Email not found"));
-                        return; // Important: stop execution here to prevent accessing empty result
+                        return;
                     }
 
                     // TODO: Implement here the decryption
@@ -245,10 +246,42 @@ public class User {
     }
     
     public static void setPin(String id, Credentials credentials, Database.Data<Void> callback) {
-        Database.db().collection("users")
-                .document(id)
-                .update("pin", new String(credentials.pin))
-                .addOnSuccessListener(doc -> callback.onSuccess(null))
+        DocumentReference docRef = Database.db().collection("users").document(id);
+
+        docRef.get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    docRef.update("credentials.pin", new String(credentials.pin))
+                            .addOnSuccessListener(doc -> callback.onSuccess(null))
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void updateDetails(String id, Credentials credentials, Details details, Database.Data<Void> callback) {
+        DocumentReference docRef = Database.db().collection("users").document(id);
+
+        docRef.get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.exists()) {
+                        callback.onFailure(new Database.DataNotFound("User not found"));
+                        return;
+                    }
+
+                    docRef.update(
+                            "credentials.password", credentials.password,
+                            "details.fullName.first", details.fullName.first,
+                            "details.fullName.last", details.fullName.last,
+                            "details.fullName.middleInitial", details.fullName.middleInitial,
+                            "details.phoneNumber", details.phoneNumber
+                    )
+                            .addOnSuccessListener(doc -> callback.onSuccess(null))
+                            .addOnFailureListener(callback::onFailure);
+                })
                 .addOnFailureListener(callback::onFailure);
     }
 }
