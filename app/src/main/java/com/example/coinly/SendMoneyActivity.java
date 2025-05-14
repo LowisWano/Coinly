@@ -33,10 +33,8 @@ public class SendMoneyActivity extends AppCompatActivity {
         // Disable Next button initially
         nextButton.setEnabled(false);
 
-        // Placeholder back navigation
         backArrow.setOnClickListener(v -> {
-            // TODO: Replace with actual destination
-            Intent intent = new Intent(SendMoneyActivity.this, DashboardActivity.class);
+            Intent intent = new Intent(SendMoneyActivity.this, MainActivity.class);
             startActivity(intent);
         });
 

@@ -17,6 +17,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class SendMoneyConfirmActivity extends AppCompatActivity {
 
+    private ImageView backArrow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +28,13 @@ public class SendMoneyConfirmActivity extends AppCompatActivity {
         ImageView swipeHandle = findViewById(R.id.swipe_handle);
         FrameLayout swipeContainer = findViewById(R.id.swipe_container);
         TextView swipeText = findViewById(R.id.swipe_text);
+
+        backArrow = findViewById(R.id.backArrow);
+
+        backArrow.setOnClickListener(v -> {
+            Intent intent = new Intent(SendMoneyConfirmActivity.this, SendMoneyActivity.class);
+            startActivity(intent);
+        });
 
         swipeHandle.setOnTouchListener(new View.OnTouchListener() {
             float downX;
