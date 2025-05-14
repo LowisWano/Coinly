@@ -23,9 +23,9 @@
         android:paddingVertical="8dp">
 
         <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
             android:id="@+id/backArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
             android:src="@drawable/ic_back_arrow" />
 
         <TextView
@@ -57,7 +57,7 @@
             <ImageView
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-
+                android:id="@+id/userProfile"
                 android:scaleType="centerCrop"
                 android:background="@drawable/circle_background" />
 
@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="John Doe"
-                    android:id="@+id/username"
+                    android:id="@+id/userName"
                     android:textColor="#F4F2C9"
                     android:textSize="16sp" />
 
@@ -85,7 +85,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="1234 567 8910"
-                        android:id="@+id/usercode"
+                        android:id="@+id/userCode"
                         android:textColor="#F4F2C9"
                         android:textSize="12sp" />
 
@@ -101,10 +101,10 @@
             </LinearLayout>
 
             <ImageView
-                android:layout_width="24dp"
+                android:id="@+id/arrowButton"
+                android:layout_width="wrap_content"
                 android:layout_height="24dp"
-                android:id="@+id/rightArrowButton"
-                android:src="@drawable/ic_right_arrow"
+                android:src="@drawable/ic_arrow" />
         </LinearLayout>
 
         <!-- Input Fields -->
@@ -157,6 +157,30 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#F4F2C9" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Next"
+                android:textSize="20sp"
+                android:backgroundTint="#FAD565"
+                android:textColor="#083248"
+                android:textStyle="bold"
+                android:id="@+id/nextButton"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <include

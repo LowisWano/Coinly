@@ -46,6 +46,14 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/circle_background"
+            android:layout_gravity="center"
+            android:id="@+id/userProfile"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,13 +63,6 @@
             android:layout_gravity="center"
             android:gravity="center_vertical"
             android:layout_marginTop="24dp">
-
-            <ImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:scaleType="centerCrop"
-                android:background="@drawable/circle_background"
-                android:id="@+id/userProfile"/>
 
             <TextView
                 android:layout_width="0dp"
@@ -95,7 +96,7 @@
                 android:textColor="#083248" />
 
             <TextView
-                android:id="@+id/recipientNumber"
+                android:id="@+id/transactionNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1098 765 4321"
@@ -127,7 +128,7 @@
                 android:textColor="#083248" />
 
             <TextView
-                android:id="@+id/amount"
+                android:id="@+id/transactionAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Php 1,234.00"
@@ -225,44 +226,13 @@
                 android:textColor="#083248" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+    </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            
-            <FrameLayout
-                android:id="@+id/swipe_container"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_margin="16dp"
-                android:background="@drawable/swipe_button_track"
-                android:clipChildren="false">
-
-                <ImageView
-                    android:id="@+id/swipe_handle"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="start"
-                    android:src="@drawable/ic_arrow_circle"
-                    android:background="@null"
-                    android:contentDescription="Swipe handle" />
-
-                <TextView
-                    android:id="@+id/swipe_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="Swipe to Confirm"
-                    android:textColor="#F8D77B"
-                    android:textSize="16sp" />
-            </FrameLayout>
-
-        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="vertical"
+        android:background="@drawable/gradient_top_to_bottom">
 
     </LinearLayout>
 
