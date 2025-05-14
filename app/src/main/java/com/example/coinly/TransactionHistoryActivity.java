@@ -11,20 +11,17 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.coinly.db.Transaction;
 import com.example.coinly.db.User;
 import com.example.coinly.db.Database;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public class TransactionHistoryActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -33,13 +30,14 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private List<Transaction> filteredTransactions;
     private EditText searchEditText;
     private ImageButton filterButton;
-    private TextView balanceText;
-    private double currentBalance = 0.0;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction_history);
+
+        userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
 
         setupViews();
         loadTransactions();
@@ -48,13 +46,10 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         setupBottomNavigation();
     }
 
-
-
     private void setupViews() {
         recyclerView = findViewById(R.id.transactionsRecyclerView);
         searchEditText = findViewById(R.id.searchEditText);
         filterButton = findViewById(R.id.filterButton);
-        balanceText = findViewById(R.id.balanceText);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         allTransactions = new ArrayList<>();
@@ -66,118 +61,66 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RequestTransactionHistoryActivity.class);
             startActivity(intent);
         });
+
+        ((TextView) findViewById(R.id.referralCodeText)).setText(userId);
+
+        User.get(
+                userId,
+                User.Details.class,
+                new Database.Data<User.Details>() {
+                    @Override
+                    public void onSuccess(User.Details data) {
+                        ((TextView) findViewById(R.id.userNameText)).setText(data.fullName.formatted());
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("TransactionHistory", "Tried to get user's details", e);
+                    }
+                }
+        );
+
+        User.get(
+                userId,
+                User.Wallet.class,
+                new Database.Data<User.Wallet>() {
+                    @Override
+                    public void onSuccess(User.Wallet data) {
+                        ((TextView) findViewById(R.id.balanceText)).setText(String.format("%.2f", data.balance));
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("TransactionHistory", "Tried to get user's wallet", e);
+                    }
+                }
+        );
     }
 
     private static final String TAG = "TransactionHistory";
 
     private void loadTransactions() {
-        allTransactions = new ArrayList<>();
-        
-        String email = "destin@gmail.com";
-        String password = "password";
-        
-        // Create credentials object
-        User.Credentials credentials = new User.Credentials()
-                .withEmail(email)
-                .withPassword(password);
-        
         // Show loading state
         Toast.makeText(this, "Loading transactions...", Toast.LENGTH_SHORT).show();
-        
-        // Call getTransactions method
-        User.getTransactions(credentials, new Database.Data<List<Map<String, Object>>>() {
+
+        Transaction.get(userId, new Database.Data<List<Transaction>>() {
             @Override
-            public void onSuccess(List<Map<String, Object>> transactions) {
-                // Process transactions data
-                for (Map<String, Object> transaction : transactions) {
-                    String name = (String) transaction.get("name");
-                    
-                    // Get date as timestamp and format it
-                    Date date = transaction.get("date") instanceof com.google.firebase.Timestamp ? 
-                            ((com.google.firebase.Timestamp) transaction.get("date")).toDate() : new Date();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
-                    String formattedDate = dateFormat.format(date);
-                    
-                    // Get amount and refNum
-                    double amount = transaction.get("amount") instanceof Number ? 
-                            ((Number) transaction.get("amount")).doubleValue() : 0.0;
-                    String refNum = (String) transaction.get("refNum");
-                    
-                    // Add transaction to list
-                    allTransactions.add(new Transaction(name, formattedDate, amount, refNum, "Your Wallet", name));
-                }
+            public void onSuccess(List<Transaction> data) {
+                allTransactions = data;
 
-                // // Calculate current balance
-                // currentBalance = 0.0;
-                // for (Transaction transaction : allTransactions) {
-                //     currentBalance += transaction.getAmount();
-                // }
+                filteredTransactions.clear();
+                filteredTransactions.addAll(allTransactions);
 
-                runOnUiThread(() -> {
-                    balanceText.setText(String.format("₱ %,.2f", Math.abs(currentBalance)));
+                ((TextView) findViewById(R.id.transactionCount)).setText(
+                        String.format("Last 7 days (%d)", allTransactions.size())
+                );
 
-                    filteredTransactions.clear();
-                    filteredTransactions.addAll(allTransactions);
-                    adapter.notifyDataSetChanged();
-                    
-                    TextView transactionCount = findViewById(R.id.transactionCount);
-                    transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
-                });
+                adapter.notifyDataSetChanged();
             }
-            
+
             @Override
             public void onFailure(Exception e) {
-                // Handle error
-                Log.e(TAG, "Failed to fetch transactions", e);
-                runOnUiThread(() -> {
-                    Toast.makeText(TransactionHistoryActivity.this, 
-                            "Could not retrieve transactions: " + e.getMessage(), 
-                            Toast.LENGTH_SHORT).show();
-                    
-                    // Use fallback data for demo purposes
-                    allTransactions.add(new Transaction(
-                        "Netflix Subscription", 
-                        "January 27, 2025", 
-                        -300.00,
-                        "NF27012025",
-                        "Your Wallet",
-                        "Netflix, Inc."
-                    ));
-                    allTransactions.add(new Transaction(
-                        "Youtube Premium", 
-                        "January 26, 2025", 
-                        -239.00,
-                        "YT26012025",
-                        "Your Wallet",
-                        "Google LLC"
-                    ));
-                    allTransactions.add(new Transaction(
-                        "24 Chicken", 
-                        "January 23, 2025", 
-                        45.00,
-                        "24C23012025",
-                        "24 Chicken",
-                        "Your Wallet"
-                    ));
-                    
-                    // Calculate current balance
-                    currentBalance = 0.0;
-                    for (Transaction transaction : allTransactions) {
-                        currentBalance += transaction.getAmount();
-                    }
-                    
-                    // Update balance display
-                    balanceText.setText(String.format("₱ %,.2f", Math.abs(currentBalance)));
-                    
-                    // Update filtered transactions
-                    filteredTransactions.clear();
-                    filteredTransactions.addAll(allTransactions);
-                    adapter.notifyDataSetChanged();
-                    
-                    // Update the transaction count text
-                    TextView transactionCount = findViewById(R.id.transactionCount);
-                    transactionCount.setText(String.format("Last 7 days (%d)", allTransactions.size()));
-                });
+                Log.e("TransactionHistory", "Tried to get user's transactions", e);
             }
         });
     }
@@ -212,10 +155,10 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        dialog.findViewById(R.id.filterDeposit).setOnClickListener(v -> {
-            filterByType(true); // true for coins added
-            dialog.dismiss();
-        });
+//        dialog.findViewById(R.id.filterDeposit).setOnClickListener(v -> {
+//            filterByType(true); // true for coins added
+//            dialog.dismiss();
+//        });
 
         dialog.findViewById(R.id.filterExpenses).setOnClickListener(v -> {
             filterByType(false); // false for coins spent
@@ -231,8 +174,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             filteredTransactions.addAll(allTransactions);
         } else {
             for (Transaction transaction : allTransactions) {
-                if (transaction.getTitle().toLowerCase().contains(query.toLowerCase()) ||
-                        transaction.getDate().toLowerCase().contains(query.toLowerCase())) {
+                if (transaction.name.toLowerCase().contains(query.toLowerCase()) ||
+                        transaction.date.toString().toLowerCase().contains(query.toLowerCase())) {
                     filteredTransactions.add(transaction);
                 }
             }
@@ -243,8 +186,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private void filterByType(boolean isCoinsAdded) {
         filteredTransactions.clear();
         for (Transaction transaction : allTransactions) {
-            if ((isCoinsAdded && transaction.getAmount() > 0) ||
-                    (!isCoinsAdded && transaction.getAmount() < 0)) {
+            if ((isCoinsAdded && transaction.amount > 0) ||
+                    (!isCoinsAdded && transaction.amount < 0)) {
                 filteredTransactions.add(transaction);
             }
         }

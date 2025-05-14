@@ -8,7 +8,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.coinly.db.Transaction;
+
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
     private List<Transaction> transactions;
@@ -30,25 +35,27 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Transaction transaction = transactions.get(position);
+
+        if (transaction == null) {
+            return;
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
         
-        holder.titleText.setText(transaction.getTitle());
-        holder.dateText.setText(transaction.getDate());
-        holder.amountText.setText(transaction.getFormattedAmount());
-        holder.amountText.setTextColor(transaction.getAmountColor());
-        holder.referenceText.setText(transaction.getRefNumber() != null ? 
-            "Ref Number: " + transaction.getRefNumber() : "");
+        holder.titleText.setText(transaction.name);
+        holder.dateText.setText(formatter.format(transaction.date.getTime()));
+        holder.amountText.setText(transaction.formattedAmount());
+        holder.amountText.setTextColor(transaction.amountColor());
+        holder.referenceText.setText("Ref Number: " + transaction.id);
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, TransactionDetailsActivity.class);
-            intent.putExtra(TransactionDetailsActivity.EXTRA_TITLE, transaction.getTitle());
-            intent.putExtra(TransactionDetailsActivity.EXTRA_DATE, transaction.getDate());
-            intent.putExtra(TransactionDetailsActivity.EXTRA_AMOUNT, transaction.getAmount());
-            intent.putExtra(TransactionDetailsActivity.EXTRA_REFERENCE, transaction.getRefNumber() != null ? 
-                transaction.getRefNumber() : "");
-            intent.putExtra(TransactionDetailsActivity.EXTRA_SENDER, transaction.getSender() != null ? 
-                transaction.getSender() : "");
-            intent.putExtra(TransactionDetailsActivity.EXTRA_RECEIVER, transaction.getReceiver() != null ? 
-                transaction.getReceiver() : "");
+            intent.putExtra(TransactionDetailsActivity.EXTRA_TITLE, transaction.name);
+            intent.putExtra(TransactionDetailsActivity.EXTRA_DATE, transaction.date);
+            intent.putExtra(TransactionDetailsActivity.EXTRA_AMOUNT, transaction.amount);
+            intent.putExtra(TransactionDetailsActivity.EXTRA_REFERENCE, transaction.id);
+            intent.putExtra(TransactionDetailsActivity.EXTRA_SENDER, transaction.senderId);
+            intent.putExtra(TransactionDetailsActivity.EXTRA_RECEIVER, transaction.receiveId);
             context.startActivity(intent);
         });
     }

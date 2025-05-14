@@ -1,5 +1,6 @@
 package com.example.coinly.db;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,6 +61,15 @@ public class User {
             public String first;
             public String last;
             public char middleInitial;
+
+            public String formatted() {
+                return String.format(
+                        "%s %s%s",
+                        this.first,
+                        (this.middleInitial != '\0') ? this.middleInitial + ". " : "",
+                        this.last
+                );
+            }
 
             public FullName withFirst(String first) {
                 this.first = first;
@@ -132,9 +142,9 @@ public class User {
 
             Object birthdate = data.get("birthdate");
 
-            if (birthdate instanceof Date) {
+            if (birthdate instanceof Timestamp) {
                 this.birthdate = new GregorianCalendar();
-                this.birthdate.setTime((Date) birthdate);
+                this.birthdate.setTime(((Timestamp) birthdate).toDate());
             }
 
             return this;

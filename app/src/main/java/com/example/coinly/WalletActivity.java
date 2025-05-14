@@ -7,6 +7,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.coinly.db.Transaction;
 import com.example.coinly.db.User;
 import com.example.coinly.db.Database;
 
@@ -14,12 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public class WalletActivity extends AppCompatActivity {
 
@@ -52,7 +50,6 @@ public class WalletActivity extends AppCompatActivity {
             loadPocketData();
             loadTransactionData();
             setupPocketsRecyclerView();
-            setupTransactionsRecyclerView();
             setupBottomNavigation();
             setupSeeAllButtons();
         } catch (Exception e) {
@@ -76,13 +73,7 @@ public class WalletActivity extends AppCompatActivity {
                 new Database.Data<User.Details>() {
                     @Override
                     public void onSuccess(User.Details data) {
-                        ((TextView) findViewById(R.id.userName)).setText(String.format(
-                                "%s %s%s",
-                                data.fullName.first,
-                                (data.fullName.middleInitial != '\0') ? data.fullName.middleInitial + ". " : "",
-                                data.fullName.last
-                                )
-                        );
+                        ((TextView) findViewById(R.id.userName)).setText(data.fullName.formatted());
                     }
 
                     @Override
@@ -112,69 +103,16 @@ public class WalletActivity extends AppCompatActivity {
     }
 
     private void loadTransactionData() {
-        transactionsList = new ArrayList<>();
-        
-        String email = "destin@gmail.com";
-        String password = "password";
-        
-        // Create credentials object
-        User.Credentials credentials = new User.Credentials()
-                .withEmail(email)
-                .withPassword(password);
-        
-        // Call getTransactions method
-        User.getTransactions(credentials, new Database.Data<List<Map<String, Object>>>() {
+        Transaction.get(userId, new Database.Data<List<Transaction>>() {
             @Override
-            public void onSuccess(List<Map<String, Object>> transactions) {
-                // Process transactions data
-                for (Map<String, Object> transaction : transactions) {
-                    String name = (String) transaction.get("name");
-                    
-                    // Get date as timestamp and format it
-                    Date date = transaction.get("date") instanceof com.google.firebase.Timestamp ? 
-                            ((com.google.firebase.Timestamp) transaction.get("date")).toDate() : new Date();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
-                    String formattedDate = dateFormat.format(date);
-                    
-                    // Get amount and refNum
-                    double amount = transaction.get("amount") instanceof Number ? 
-                            ((Number) transaction.get("amount")).doubleValue() : 0.0;
-                    String refNum = (String) transaction.get("refNum");
-                    
-                    // Add transaction to list
-                    transactionsList.add(new Transaction(name, formattedDate, amount, refNum, "Your Wallet", name));
-                }
-
-                // Update the RecyclerView on UI thread
-                runOnUiThread(() -> {
-                    if (transactionAdapter != null) {
-                        transactionAdapter.notifyDataSetChanged();
-                    } else {
-                        setupTransactionsRecyclerView();
-                    }
-                });
+            public void onSuccess(List<Transaction> data) {
+                transactionsList = data;
+                setupTransactionsRecyclerView();
             }
-            
+
             @Override
             public void onFailure(Exception e) {
-                // Handle error
-                Log.e(TAG, "Failed to fetch transactions", e);
-                runOnUiThread(() -> {
-                    Toast.makeText(WalletActivity.this, 
-                            "Could not retrieve transactions: " + e.getMessage(), 
-                            Toast.LENGTH_SHORT).show();
-                    
-                    // Use fallback data
-                    transactionsList.add(new Transaction("Netflix Subscription", "April 27, 2025", -300.00));
-                    transactionsList.add(new Transaction("Youtube Premium", "April 26, 2025", -239.00));
-                    transactionsList.add(new Transaction("Deposit from 24 Chicken", "April 23, 2025", 45.00));
-                    
-                    if (transactionAdapter != null) {
-                        transactionAdapter.notifyDataSetChanged();
-                    } else {
-                        setupTransactionsRecyclerView();
-                    }
-                });
+                Log.e("Wallet", "Tried to get user's transactions", e);
             }
         });
     }
@@ -189,7 +127,7 @@ public class WalletActivity extends AppCompatActivity {
                 Toast.makeText(this, pocket.getName() + " pocket clicked", Toast.LENGTH_SHORT).show();
                 // Navigate to pocket details in a real app
             });
-            
+
             pocketsRecyclerView.setAdapter(pocketAdapter);
         }
     }
