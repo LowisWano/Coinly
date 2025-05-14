@@ -276,7 +276,7 @@ public class User {
                             "credentials.password", credentials.password,
                             "details.fullName.first", details.fullName.first,
                             "details.fullName.last", details.fullName.last,
-                            "details.fullName.middleInitial", details.fullName.middleInitial,
+                            "details.fullName.middleInitial", Character.toString(details.fullName.middleInitial),
                             "details.phoneNumber", details.phoneNumber
                     )
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
