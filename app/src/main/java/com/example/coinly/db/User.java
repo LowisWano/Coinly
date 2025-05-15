@@ -405,9 +405,7 @@ public class User {
 
     private static void executeMoneyTransfer(
             DocumentReference senderRef,
-            DocumentSnapshot senderSnapshot,
             DocumentReference recipientRef,
-            DocumentSnapshot recipientSnapshot,
             float amount,
             Database.Data<String> callback
     ) {
@@ -429,32 +427,35 @@ public class User {
                     transaction.update(senderRef, "wallet.balance", senderBalance - amount);
                     transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
 
-                    DocumentSnapshot counterSnapshot = transaction.get(counterRef);
-                    String nextId = Long.toString(counterSnapshot.getLong("value") + 1);
+                    long nextId = counterSnap.getLong("value") + 1;
                     transaction.update(counterRef, "value", nextId);
 
                     Transaction txn = new Transaction()
                             .withSenderId(senderRef.getId())
                             .withReceiveId(recipientRef.getId())
                             .withAmount(amount)
+                            .withName("Send Money")
                             .withDate(new GregorianCalendar());
 
                     Map<String, Object> txnMap = new HashMap<>();
                     txnMap.put("senderId", txn.senderId);
                     txnMap.put("receiveId", txn.receiveId);
                     txnMap.put("amount", txn.amount);
+                    txnMap.put("name", txn.name);
                     txnMap.put("date", txn.date.getTime());
 
-                    DocumentReference txnRef = db.collection("transactions").document(nextId);
+                    String id = Long.toString(nextId);
+
+                    DocumentReference txnRef = db.collection("transactions").document(id);
                     transaction.set(txnRef, txnMap);
 
-                    return nextId;
+                    return id;
                 })
                 .addOnSuccessListener(id -> callback.onSuccess(id))
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void sendMoneyFromPhoneNumber(String id, String toPhone, float amount, Database.Data<String> callback) {
+    public static void sendMoney(String id, String toPhone, float amount, Database.Data<String> callback) {
         FirebaseFirestore db = Database.db();
         DocumentReference senderRef = db.collection("users").document(id);
 
@@ -487,39 +488,7 @@ public class User {
                             DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
                             DocumentReference recipientRef = recipientSnapshot.getReference();
 
-                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
-                        })
-                        .addOnFailureListener(callback::onFailure);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                callback.onFailure(e);
-            }
-        });
-    }
-
-    public static void sendMoneyFromUserID(String id, String toUserId, float amount, Database.Data<String> callback) {
-        if (id.equals(toUserId)) {
-            callback.onFailure(new IllegalArgumentException("Cannot send money to yourself"));
-            return;
-        }
-
-        FirebaseFirestore db = Database.db();
-        DocumentReference senderRef = db.collection("users").document(id);
-        DocumentReference recipientRef = db.collection("users").document(toUserId);
-
-        getSender(id, new Database.Data<>() {
-            @Override
-            public void onSuccess(DocumentSnapshot senderSnapshot) {
-                recipientRef.get()
-                        .addOnSuccessListener(recipientSnapshot -> {
-                            if (!recipientSnapshot.exists()) {
-                                callback.onFailure(new Database.DataNotFound("Recipient not found"));
-                                return;
-                            }
-
-                            executeMoneyTransfer(senderRef, senderSnapshot, recipientRef, recipientSnapshot, amount, callback);
+                            executeMoneyTransfer(senderRef, recipientRef, amount, callback);
                         })
                         .addOnFailureListener(callback::onFailure);
             }
@@ -545,6 +514,35 @@ public class User {
 
                     if (data == null) {
                         callback.onFailure(new Database.DataNotFound("User's data is empty"));
+                        return;
+                    }
+
+                    try {
+                        T instance = clazz.newInstance();
+
+                        callback.onSuccess(instance.parser(data));
+                    } catch (Exception e) {
+                        callback.onFailure(e);
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static <T extends Database.MapParser<T>> void getFromPhoneNumber(String phoneNumber, Class<T> clazz, Database.Data<T> callback) {
+        Database.db().collection("users")
+                .whereEqualTo("details.phoneNumber", phoneNumber)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        callback.onFailure(new Database.DataNotFound("User with phone number not found"));
+                        return;
+                    }
+
+                    DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+                    Map<String, Object> data = doc.getData();
+
+                    if (data == null) {
+                        callback.onFailure(new Database.DataNotFound("User with phone number not found"));
                         return;
                     }
 

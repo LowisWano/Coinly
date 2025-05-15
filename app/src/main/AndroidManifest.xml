@@ -18,7 +18,10 @@
         android:theme="@style/Theme.Coinly"
         tools:targetApi="31">
         <activity
-            android:name=".SendMoneySummaryActivity"
+            android:name=".ChangePinActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PocketDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".MyQRActivity"
@@ -29,13 +32,7 @@
         <activity
             android:name=".SendMoneyActivity"
             android:exported="true" />
-        <activity
-            android:name=".ChangePinActivity"
-            android:exported="false" />
         <activity android:name=".AddFundsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PocketDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".PocketActivity"
@@ -58,10 +55,6 @@
         <activity
             android:name=".LoginActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".RegisterActivity"
@@ -80,7 +73,12 @@
             android:exported="false" />
         <activity
             android:name=".WalletActivity"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
