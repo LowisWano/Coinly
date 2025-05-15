@@ -427,8 +427,7 @@ public class User {
                     transaction.update(senderRef, "wallet.balance", senderBalance - amount);
                     transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
 
-                    DocumentSnapshot counterSnapshot = transaction.get(counterRef);
-                    String nextId = Long.toString(counterSnapshot.getLong("value") + 1);
+                    long nextId = counterSnap.getLong("value") + 1;
                     transaction.update(counterRef, "value", nextId);
 
                     Transaction txn = new Transaction()
@@ -445,10 +444,12 @@ public class User {
                     txnMap.put("name", txn.name);
                     txnMap.put("date", txn.date.getTime());
 
-                    DocumentReference txnRef = db.collection("transactions").document(nextId);
+                    String id = Long.toString(nextId);
+
+                    DocumentReference txnRef = db.collection("transactions").document(id);
                     transaction.set(txnRef, txnMap);
 
-                    return nextId;
+                    return id;
                 })
                 .addOnSuccessListener(id -> callback.onSuccess(id))
                 .addOnFailureListener(callback::onFailure);
