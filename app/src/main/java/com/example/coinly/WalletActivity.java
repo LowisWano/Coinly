@@ -199,7 +199,8 @@ public class WalletActivity extends AppCompatActivity {
         TextView seeAllPockets = findViewById(R.id.seeAllPockets);
         if (seeAllPockets != null) {
             seeAllPockets.setOnClickListener(v -> {
-                Toast.makeText(this, "All Pockets coming soon", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, PocketActivity.class);
+                startActivity(intent);
             });
         }
         
