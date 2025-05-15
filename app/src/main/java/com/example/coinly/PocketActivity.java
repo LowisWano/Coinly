@@ -200,9 +200,17 @@ public class PocketActivity extends AppCompatActivity {
                 
                 @Override
                 public void onAddFundsClick(Pocket pocket, int position) {
-                    // Handle add funds button click
-                    Toast.makeText(PocketActivity.this, "Add funds to: " + pocket.name, Toast.LENGTH_SHORT).show();
-                    // TODO: Navigate to add funds activity/dialog
+                    // Launch AddFundsActivity
+                    Intent addFundsIntent = new Intent(PocketActivity.this, AddFundsActivity.class);
+                    
+                    // Pass the pocket details to the Add Funds activity
+                    addFundsIntent.putExtra("id", pocket.id);
+                    addFundsIntent.putExtra("POCKET_NAME", pocket.name);
+                    addFundsIntent.putExtra("POCKET_TARGET", pocket.target);
+                    addFundsIntent.putExtra("POCKET_CURRENT", pocket.balance);
+                    addFundsIntent.putExtra("POCKET_LOCKED", pocket.locked);
+                    
+                    startActivityForResult(addFundsIntent, 1001); // Using 1001 as request code
                 }
             });
             
@@ -210,6 +218,16 @@ public class PocketActivity extends AppCompatActivity {
 
             pocketsRecyclerView.setPadding(0, 0, 0, 160);
             pocketsRecyclerView.setClipToPadding(false);
+        }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            // Refresh the pockets list
+            loadPocketData();
         }
     }
     
