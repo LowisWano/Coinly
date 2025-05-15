@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.coinly.db.Pocket;
+
 import java.util.List;
 
 public class PocketAdapter extends RecyclerView.Adapter<PocketAdapter.ViewHolder> {
@@ -38,14 +40,13 @@ public class PocketAdapter extends RecyclerView.Adapter<PocketAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Pocket pocket = pockets.get(position);
         
-        holder.pocketName.setText(pocket.getName());
-        holder.pocketTarget.setText(pocket.getFormattedTarget());
-        holder.pocketIcon.setImageResource(pocket.getIconResourceId());
-        holder.pocketProgress.setProgress(pocket.getProgressPercentage());
-        holder.pocketProgressPercent.setText(pocket.getProgressPercentage() + "%");
+        holder.pocketName.setText(pocket.name);
+        holder.pocketTarget.setText(String.format("Php %s", Util.amountFormatter(pocket.target)));
+        holder.pocketProgress.setProgress(pocket.percent());
+        holder.pocketProgressPercent.setText(pocket.percent() + "%");
         
         // Show lock icon if pocket is locked
-        holder.pocketLockIcon.setVisibility(pocket.isLocked() ? View.VISIBLE : View.GONE);
+        holder.pocketLockIcon.setVisibility(pocket.locked ? View.VISIBLE : View.GONE);
         
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

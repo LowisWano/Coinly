@@ -6,12 +6,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.coinly.db.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
         transactionsList = new ArrayList<>();
         
         // Add some sample transactions
-        transactionsList.add(new Transaction("Received from John Doe", "Today, 2:30 PM", 500.00));
-        transactionsList.add(new Transaction("Paid to Coffee Shop", "Today, 11:25 AM", -120.50));
-        transactionsList.add(new Transaction("Received from Maria Garcia", "Yesterday, 5:15 PM", 1000.00));
+//        transactionsList.add(new Transaction("Received from John Doe", "Today, 2:30 PM", 500.00));
+//        transactionsList.add(new Transaction("Paid to Coffee Shop", "Today, 11:25 AM", -120.50));
+//        transactionsList.add(new Transaction("Received from Maria Garcia", "Yesterday, 5:15 PM", 1000.00));
         
         // Show/hide the "no transactions" message
         if (transactionsList.isEmpty()) {

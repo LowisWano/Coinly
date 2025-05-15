@@ -1,18 +1,15 @@
 package com.example.coinly;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public class TransactionDetailsActivity extends AppCompatActivity {
-    public static final String EXTRA_TITLE = "title";
-    public static final String EXTRA_DATE = "date";
-    public static final String EXTRA_AMOUNT = "amount";
-    public static final String EXTRA_REFERENCE = "reference";
-    public static final String EXTRA_SENDER = "sender";
-    public static final String EXTRA_RECEIVER = "receiver";
+import com.example.coinly.db.Database;
+import com.example.coinly.db.Transaction;
 
+public class TransactionDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,12 +27,7 @@ public class TransactionDetailsActivity extends AppCompatActivity {
     }
 
     private void displayTransactionDetails() {
-        String title = getIntent().getStringExtra(EXTRA_TITLE);
-        String date = getIntent().getStringExtra(EXTRA_DATE);
-        double amount = getIntent().getDoubleExtra(EXTRA_AMOUNT, 0);
-        String reference = getIntent().getStringExtra(EXTRA_REFERENCE);
-        String sender = getIntent().getStringExtra(EXTRA_SENDER);
-        String receiver = getIntent().getStringExtra(EXTRA_RECEIVER);
+        String id = getIntent().getStringExtra("id");
 
         TextView amountText = findViewById(R.id.transactionAmount);
         TextView titleText = findViewById(R.id.transactionTitle);
@@ -44,16 +36,24 @@ public class TransactionDetailsActivity extends AppCompatActivity {
         TextView receiverText = findViewById(R.id.receiverText);
         TextView referenceText = findViewById(R.id.referenceText);
 
-        // Show actual amount including negative values
-        String formattedAmount = (amount >= 0 ? "+ " : "- ") + "Php " + String.format("%.2f", Math.abs(amount));
-        amountText.setText(formattedAmount);
-        amountText.setTextColor(amount >= 0 ? 0xFF4CAF50 : 0xFFE91E63);
+        Transaction.getFrom(id, new Database.Data<Transaction>() {
+            @Override
+            public void onSuccess(Transaction data) {
+                amountText.setText(data.formattedAmount());
+                amountText.setTextColor(data.amountColor());
+                titleText.setText(data.name);
+                dateText.setText(Util.dateFormatter(data.date));
+                senderText.setText(data.senderId);
+                receiverText.setText(data.receiveId);
+                referenceText.setText(data.id);
+            }
 
-        titleText.setText(title);
-        dateText.setText(date);
-        senderText.setText(sender);
-        receiverText.setText(receiver);
-        referenceText.setText(reference);
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("TransactionDetails", "Tried to get transaction", e);
+                finish();
+            }
+        });
     }
 
     @Override

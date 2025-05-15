@@ -1,5 +1,6 @@
 package com.example.coinly.db;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,6 +61,15 @@ public class User {
             public String first;
             public String last;
             public char middleInitial;
+
+            public String formatted() {
+                return String.format(
+                        "%s %s%s",
+                        this.first,
+                        (this.middleInitial != '\0') ? this.middleInitial + ". " : "",
+                        this.last
+                );
+            }
 
             public FullName withFirst(String first) {
                 this.first = first;
@@ -130,16 +140,11 @@ public class User {
             this.phoneNumber = (String) data.get("phoneNumber");
             this.fullName = new FullName().parser(data);
 
-            Object birthdateObj = data.get("birthdate");
+            Object birthdate = data.get("birthdate");
 
-            if (birthdateObj instanceof Map<?, ?>) {
-                Map<?, ?> birthMap = (Map<?, ?>) birthdateObj;
-
-                int year = ((Number) Objects.requireNonNull(birthMap.get("year"))).intValue();
-                int month = ((Number) Objects.requireNonNull(birthMap.get("month"))).intValue();
-                int day = ((Number) Objects.requireNonNull(birthMap.get("day"))).intValue();
-
-                this.birthdate = new GregorianCalendar(year, month, day);
+            if (birthdate instanceof Timestamp) {
+                this.birthdate = new GregorianCalendar();
+                this.birthdate.setTime(((Timestamp) birthdate).toDate());
             }
 
             return this;
@@ -216,27 +221,6 @@ public class User {
                 this.balance = (Double) balance;
             }
 
-            return this;
-        }
-    }
-
-    public static class Savings {
-        public String name;
-        public float target;
-        public float balance;
-
-        public Savings withName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Savings withTarget(float target) {
-            this.target = target;
-            return this;
-        }
-
-        public Savings withBalance(float balance) {
-            this.balance = balance;
             return this;
         }
     }

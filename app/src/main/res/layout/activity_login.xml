@@ -103,7 +103,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:textColor="#000000"
+                    android:textColor="#FFFFFF"
      />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -127,7 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textColor="#000000"
+                    android:textColor="#ffffff"
       />
             </com.google.android.material.textfield.TextInputLayout>
 

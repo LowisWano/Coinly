@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.coinly.db.Pocket;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -44,27 +45,21 @@ public class PocketCardAdapter extends RecyclerView.Adapter<PocketCardAdapter.Vi
         final int adapterPosition = position;
         
         // Set pocket name and icon
-        holder.pocketName.setText(pocket.getName());
-        holder.pocketIcon.setImageResource(pocket.getIconResourceId());
-        
+        holder.pocketName.setText(pocket.name);
+
         // Set description (this is a new field in pocket_card.xml)
         // In a real app, you would have this data in your Pocket model
-        holder.pocketDescription.setText("Saving for " + pocket.getName().toLowerCase() + " expenses");
+        holder.pocketDescription.setText("Saving for " + pocket.name.toLowerCase() + " expenses");
         
-        // Set target amount
-        holder.pocketTarget.setText(pocket.getFormattedTarget());
-        
-        // Set current balance
-        String formattedBalance = "Php " + String.format("%,.2f", pocket.getCurrentAmount());
-        holder.pocketBalance.setText(formattedBalance);
+        holder.pocketTarget.setText("Php " + Util.amountFormatter(pocket.target));
+        holder.pocketBalance.setText("Php " + Util.amountFormatter(pocket.balance));
         
         // Set progress percentage and progress bar
-        int progressPercentage = pocket.getProgressPercentage();
-        holder.pocketProgress.setProgress(progressPercentage);
-        holder.pocketProgressPercent.setText(progressPercentage + "%");
+        holder.pocketProgress.setProgress(pocket.percent());
+        holder.pocketProgressPercent.setText(pocket.percent() + "%");
         
         // Show lock icon if pocket is locked
-        holder.pocketLockIcon.setVisibility(pocket.isLocked() ? View.VISIBLE : View.GONE);
+        holder.pocketLockIcon.setVisibility(pocket.locked ? View.VISIBLE : View.GONE);
         
         // Set click listeners
         holder.itemView.setOnClickListener(v -> {
