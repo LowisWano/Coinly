@@ -83,7 +83,7 @@ public class SendMoneyActivity extends AppCompatActivity {
 
             }
 
-            User.sendMoneyFromPhoneNumber(UserID, number, Float.parseFloat(amount), new Database.Data<String>() {
+            User.sendMoney(UserID, number, Float.parseFloat(amount), new Database.Data<String>() {
                 @Override
                 public void onSuccess(String data) {
                     Intent intent = new Intent(SendMoneyActivity.this, SendMoneyConfirmActivity.class);
@@ -118,7 +118,7 @@ public class SendMoneyActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Exception e) {
-                        // invalid phone number, invalid amount
+                        Log.e("SendMoney", "Tried to send money", e);
                     }
                 }
         );
