@@ -186,7 +186,7 @@
                 android:layout_marginStart="8dp"
                 android:padding="12dp"
                 app:cornerRadius="8dp"
-                app:backgroundTint="#FFDA44"/>
+                app:backgroundTint="#FAD565"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
