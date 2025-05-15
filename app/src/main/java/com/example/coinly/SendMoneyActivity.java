@@ -132,6 +132,11 @@ public class SendMoneyActivity extends AppCompatActivity {
                 }
         );
 
+        Intent intent = getIntent();
+
+        if (intent != null) {
+            editTextNumber.setText(intent.getStringExtra("phoneNumber"));
+        }
     }
 
 
