@@ -155,10 +155,10 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-//        dialog.findViewById(R.id.filterDeposit).setOnClickListener(v -> {
-//            filterByType(true); // true for coins added
-//            dialog.dismiss();
-//        });
+        dialog.findViewById(R.id.filterDeposit).setOnClickListener(v -> {
+            filterByType(true); // true for coins added
+            dialog.dismiss();
+        });
 
         dialog.findViewById(R.id.filterExpenses).setOnClickListener(v -> {
             filterByType(false); // false for coins spent
@@ -187,7 +187,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         filteredTransactions.clear();
         for (Transaction transaction : allTransactions) {
             if ((isCoinsAdded && transaction.type == Transaction.Type.Receive) ||
-                    (!isCoinsAdded && transaction.type == Transaction.Type.Deposit)) {
+                    (!isCoinsAdded && transaction.type == Transaction.Type.Transfer)) {
                 filteredTransactions.add(transaction);
             }
         }
