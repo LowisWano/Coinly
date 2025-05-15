@@ -24,6 +24,15 @@
             android:name=".PocketDetailsActivity"
             android:exported="false" />
         <activity
+            android:name=".MyQRActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SendMoneyConfirmActivity"
+            android:exported="true" />
+        <activity
+            android:name=".SendMoneyActivity"
+            android:exported="true" />
+        <activity
             android:name=".PocketActivity"
             android:exported="false" />
         <activity

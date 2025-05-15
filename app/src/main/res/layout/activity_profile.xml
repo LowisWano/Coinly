@@ -264,41 +264,41 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Used Points"
-                    android:textStyle="bold"
-                    android:textColor="#083248"
-                    android:textSize="16sp"
-                    android:paddingTop="16dp" />
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Used Points"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:textColor="#083248"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:paddingTop="16dp" />-->
 
-                <ProgressBar
-                    android:id="@+id/usedPointsProgress"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="5dp"
-                    android:progress="45"
-                    android:progressDrawable="@drawable/progress_profile_drawable" />
+<!--                <ProgressBar-->
+<!--                    android:id="@+id/usedPointsProgress"-->
+<!--                    style="?android:attr/progressBarStyleHorizontal"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="8dp"-->
+<!--                    android:layout_marginTop="5dp"-->
+<!--                    android:progress="45"-->
+<!--                    android:progressDrawable="@drawable/progress_profile_drawable" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Invited Users"
-                    android:textStyle="bold"
-                    android:textColor="#083248"
-                    android:textSize="16sp"
-                    android:paddingTop="16dp" />
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Invited Users"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:textColor="#083248"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:paddingTop="16dp" />-->
 
-                <ProgressBar
-                    android:id="@+id/invitedUsersProgress"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="5dp"
-                    android:progress="80"
-                    android:progressDrawable="@drawable/progress_profile_drawable" />
+<!--                <ProgressBar-->
+<!--                    android:id="@+id/invitedUsersProgress"-->
+<!--                    style="?android:attr/progressBarStyleHorizontal"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="8dp"-->
+<!--                    android:layout_marginTop="5dp"-->
+<!--                    android:progress="80"-->
+<!--                    android:progressDrawable="@drawable/progress_profile_drawable" />-->
 
                 <LinearLayout
                     android:id="@+id/logout_button"
