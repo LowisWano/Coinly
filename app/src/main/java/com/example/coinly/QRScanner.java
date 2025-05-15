@@ -139,7 +139,11 @@ public class QRScanner extends AppCompatActivity {
                                     for (Barcode barcode : barcodes) {
                                         String value = barcode.getRawValue();
                                         if (value != null) {
-                                            runOnUiThread(() -> Toast.makeText(QRScanner.this, "QR Code: " + value, Toast.LENGTH_SHORT).show());
+                                            runOnUiThread(() -> {
+                                                Intent intent = new Intent(this, SendMoneyActivity.class);
+                                                intent.putExtra("phoneNumber", value);
+                                                startActivity(intent);
+                                            });
                                         }
                                     }
                                 })
