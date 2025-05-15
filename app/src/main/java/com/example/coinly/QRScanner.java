@@ -1,5 +1,6 @@
 package com.example.coinly;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.Manifest;
 import android.graphics.RectF;
@@ -167,6 +168,7 @@ public class QRScanner extends AppCompatActivity {
     }
 
     private void useNumber(View v) {
-        // TODO
+        Intent intent = new Intent(this, SendMoneyActivity.class);
+        startActivity(intent);
     }
 }

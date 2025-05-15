@@ -62,21 +62,21 @@ public class ProfileActivity extends AppCompatActivity {
 
         loadUserProfile(userId, profileName, profilePhone, profileEmail, profileBirthdate, profileAddress);
 
-        currencyDropdown.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Choose Currency")
-                    .setItems(currencies, (dialog, which) -> {
-                        selectedCurrency.setText(currencies[which]);
-                    }).show();
-        });
-
-        languageDropdown.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Choose Language")
-                    .setItems(languages, (dialog, which) -> {
-                        selectedLanguage.setText(languages[which]);
-                    }).show();
-        });
+//        currencyDropdown.setOnClickListener(v -> {
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Choose Currency")
+//                    .setItems(currencies, (dialog, which) -> {
+//                        selectedCurrency.setText(currencies[which]);
+//                    }).show();
+//        });
+//
+//        languageDropdown.setOnClickListener(v -> {
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Choose Language")
+//                    .setItems(languages, (dialog, which) -> {
+//                        selectedLanguage.setText(languages[which]);
+//                    }).show();
+//        });
 
         logoutButton.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);

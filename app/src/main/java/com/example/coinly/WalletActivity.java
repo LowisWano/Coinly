@@ -182,7 +182,8 @@ public class WalletActivity extends AppCompatActivity {
         });
 
         qrButton.setOnClickListener(v -> {
-            // TODO: Open QR scanner
+            startActivity(new Intent(this, QRScanner.class));
+            finish();
         });
 
         // Mark transactions button as selected
