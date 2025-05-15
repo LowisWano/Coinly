@@ -23,6 +23,7 @@ public class AddFundsActivity extends AppCompatActivity {
     private ImageView backButton;
     private TextView availableBalance;
     private TextView balanceAfter;
+
     private TextView pocketBalanceAfter;
     private TextInputEditText amountInput;
     private MaterialButton confirmAddFundsButton;
@@ -32,6 +33,7 @@ public class AddFundsActivity extends AppCompatActivity {
     private double targetAmount;
     private int iconResId;
     private boolean isLocked;
+
     private String pocketId;
     private String userId;
     private double walletBalance;
@@ -42,10 +44,9 @@ public class AddFundsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_funds);
-        
+
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
-        
         // Initialize views
         initViews();
         
@@ -66,6 +67,7 @@ public class AddFundsActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
         availableBalance = findViewById(R.id.availableBalance);
         balanceAfter = findViewById(R.id.balanceAfter);
+
         pocketBalanceAfter = findViewById(R.id.pocketBalanceAfter);
         amountInput = findViewById(R.id.amountInput);
         confirmAddFundsButton = findViewById(R.id.confirmAddFundsButton);
@@ -141,7 +143,7 @@ public class AddFundsActivity extends AppCompatActivity {
             if (amountInput.getText() != null && !amountInput.getText().toString().isEmpty()) {
                 amountToAdd = Double.parseDouble(amountInput.getText().toString());
             }
-            
+
             // Update wallet balance after
             double newWalletBalance = walletBalance - amountToAdd;
             String formattedWalletBalance = "Php " + String.format("%,.2f", newWalletBalance);
