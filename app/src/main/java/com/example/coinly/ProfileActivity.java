@@ -229,10 +229,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         walletButton.setOnClickListener(v -> {
             // TODO: Navigate to Wallet screen
+            startActivity(new Intent(this, PocketActivity.class));
+            finish();
         });
 
         qrButton.setOnClickListener(v -> {
-            // TODO: Open QR scanner
+            startActivity(new Intent(this, QRScanner.class));
+            finish();
         });
 
         // Mark transactions button as selected
