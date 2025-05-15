@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,9 +23,6 @@ public class SendMoneyActivity extends AppCompatActivity {
     private EditText editTextNumber, editTextAmount;
     private Button nextButton;
 
-    private float currentBalance = 0f;
-    private String currentUserPhoneNumber = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,109 +35,114 @@ public class SendMoneyActivity extends AppCompatActivity {
         editTextAmount = findViewById(R.id.editTextAmount);
         nextButton = findViewById(R.id.nextButton);
 
-        // Get current user ID
-        String userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
-
-        // Set header values
-        User.get(userId, User.Details.class, new Database.Data<User.Details>() {
-            @Override
-            public void onSuccess(User.Details data) {
-                TextView userName = findViewById(R.id.userName);
-                TextView phoneNumber = findViewById(R.id.phoneNumber);
-
-                userName.setText(data.fullName.first + " " + data.fullName.middleInitial + " " + data.fullName.last);
-                currentUserPhoneNumber = data.phoneNumber;
-                phoneNumber.setText(data.phoneNumber);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(SendMoneyActivity.this, "Failed to load user details", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Get balance
-        User.get(userId, User.Wallet.class, new Database.Data<User.Wallet>() {
-            @Override
-            public void onSuccess(User.Wallet data) {
-                currentBalance = (float) data.balance;
-                TextView enterAmount = findViewById(R.id.enterAmount);
-                enterAmount.setText(String.format("Enter Amount (%.2f)", currentBalance));
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(SendMoneyActivity.this, "Failed to load wallet info", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Navigation
         backArrow.setOnClickListener(v -> {
-            Intent intent = new Intent(SendMoneyActivity.this, WalletActivity.class);
+            Intent intent = new Intent(SendMoneyActivity.this, MainActivity.class);
             startActivity(intent);
-            finish();
         });
 
+        // Navigate to MyQRActivity
         arrowButton.setOnClickListener(v -> {
             Intent intent = new Intent(SendMoneyActivity.this, MyQRActivity.class);
             startActivity(intent);
         });
 
-        // Enable "Next" only when both fields are not empty
+        // Watch input fields to enable "Next"
         TextWatcher formWatcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // no-op
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                boolean enable = !editTextNumber.getText().toString().trim().isEmpty()
-                        && !editTextAmount.getText().toString().trim().isEmpty();
-                nextButton.setEnabled(enable);
+                // Enable "Next" if both fields are filled
+                String number = editTextNumber.getText().toString().trim();
+                String amount = editTextAmount.getText().toString().trim();
+                nextButton.setEnabled(!number.isEmpty() && !amount.isEmpty());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // no-op
             }
         };
 
         editTextNumber.addTextChangedListener(formWatcher);
         editTextAmount.addTextChangedListener(formWatcher);
 
-        // "Next" Button Logic
+        String UserID = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
+
+        // Handle "Next" button click
         nextButton.setOnClickListener(v -> {
             String number = editTextNumber.getText().toString().trim();
-            String amountStr = editTextAmount.getText().toString().trim();
+            String amount = editTextAmount.getText().toString().trim();
 
-            if (number.isEmpty() || amountStr.isEmpty()) {
-                Toast.makeText(this, "Fields should not be empty", Toast.LENGTH_SHORT).show();
-                return;
+            if (number.isEmpty() || amount.isEmpty()) {
+                Toast.makeText(SendMoneyActivity.this, "Please enter both number and amount", Toast.LENGTH_SHORT).show();
+            } else {
+
             }
 
-            float amount;
-            try {
-                amount = Float.parseFloat(amountStr);
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            User.sendMoneyFromPhoneNumber(UserID, number, Float.parseFloat(amount), new Database.Data<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    Intent intent = new Intent(SendMoneyActivity.this, SendMoneyConfirmActivity.class);
+                    intent.putExtra("number", number);
+                    intent.putExtra("amount", amount);
+                    startActivity(intent);
+                }
 
-            if (amount <= 0) {
-                Toast.makeText(this, "Amount must be greater than 0", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (amount > currentBalance) {
-                Toast.makeText(this, "Insufficient balance", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (number.equals(currentUserPhoneNumber)) {
-                Toast.makeText(this, "You cannot send money to yourself", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Pass to confirmation page (database logic will be done there)
-            Intent intent = new Intent(SendMoneyActivity.this, SendMoneyConfirmActivity.class);
-            intent.putExtra("number", number);
-            intent.putExtra("amount", amountStr);
-            intent.putExtra("senderId", userId);
-            startActivity(intent);
+                @Override
+                public void onFailure(Exception e) {
+                    Log.e("Error", "Error", e);
+                }
+            });
         });
+
+
+
+        User.get(
+                UserID,
+                User.Details.class,
+                new Database.Data<User.Details>(){
+
+                    @Override
+                    public void onSuccess(User.Details data) {
+                        TextView userName, phoneNumber;
+                        userName = findViewById(R.id.userName);
+                        phoneNumber = findViewById(R.id.phoneNumber);
+
+                        userName.setText(data.fullName.first + data.fullName.middleInitial + data.fullName.last);
+                        phoneNumber.setText(data.phoneNumber);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        // invalid phone number, invalid amount
+                    }
+                }
+        );
+
+        User.get(
+                UserID,
+                User.Wallet.class,
+                new Database.Data<User.Wallet>(){
+
+                    @Override
+                    public void onSuccess(User.Wallet data) {
+                        TextView enterAmount = findViewById(R.id.enterAmount);
+
+                        enterAmount.setText(String.format("Enter Amount (%.2f)", data.balance));
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("Error", "Error", e);
+                    }
+                }
+        );
+
     }
+
+
 }
