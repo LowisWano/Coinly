@@ -70,7 +70,7 @@ public class SendMoneyActivity extends AppCompatActivity {
         editTextNumber.addTextChangedListener(formWatcher);
         editTextAmount.addTextChangedListener(formWatcher);
 
-        String UserID = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
+        String userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
 
         // Handle "Next" button click
         nextButton.setOnClickListener(v -> {
@@ -79,30 +79,17 @@ public class SendMoneyActivity extends AppCompatActivity {
 
             if (number.isEmpty() || amount.isEmpty()) {
                 Toast.makeText(SendMoneyActivity.this, "Please enter both number and amount", Toast.LENGTH_SHORT).show();
-            } else {
-
             }
 
-            User.sendMoney(UserID, number, Float.parseFloat(amount), new Database.Data<String>() {
-                @Override
-                public void onSuccess(String data) {
-                    Intent intent = new Intent(SendMoneyActivity.this, SendMoneyConfirmActivity.class);
-                    intent.putExtra("number", number);
-                    intent.putExtra("amount", amount);
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Log.e("Error", "Error", e);
-                }
-            });
+            Intent intent = new Intent(SendMoneyActivity.this, SendMoneyConfirmActivity.class);
+            intent.putExtra("number", number);
+            intent.putExtra("amount", amount);
+            intent.putExtra("senderId", userId);
+            startActivity(intent);
         });
 
-
-
         User.get(
-                UserID,
+                userId,
                 User.Details.class,
                 new Database.Data<User.Details>(){
 
@@ -112,7 +99,7 @@ public class SendMoneyActivity extends AppCompatActivity {
                         userName = findViewById(R.id.userName);
                         phoneNumber = findViewById(R.id.phoneNumber);
 
-                        userName.setText(data.fullName.first + data.fullName.middleInitial + data.fullName.last);
+                        userName.setText(data.fullName.formatted());
                         phoneNumber.setText(data.phoneNumber);
                     }
 
@@ -124,7 +111,7 @@ public class SendMoneyActivity extends AppCompatActivity {
         );
 
         User.get(
-                UserID,
+                userId,
                 User.Wallet.class,
                 new Database.Data<User.Wallet>(){
 
@@ -132,7 +119,7 @@ public class SendMoneyActivity extends AppCompatActivity {
                     public void onSuccess(User.Wallet data) {
                         TextView enterAmount = findViewById(R.id.enterAmount);
 
-                        enterAmount.setText(String.format("Enter Amount (%.2f)", data.balance));
+                        enterAmount.setText(String.format("Enter Amount (Php %s)", Util.amountFormatter(data.balance)));
                     }
 
                     @Override

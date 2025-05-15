@@ -15,10 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.coinly.db.Database;
 import com.example.coinly.db.User;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class SendMoneyConfirmActivity extends AppCompatActivity {
@@ -34,8 +33,6 @@ public class SendMoneyConfirmActivity extends AppCompatActivity {
 
     // UI elements
     private TextView userNameText, recipientNumberText, amountText, totalAmountText, transactionDateText;
-    private String formattedDate = "";
-    private String referenceNumber = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +43,6 @@ public class SendMoneyConfirmActivity extends AppCompatActivity {
         senderId = getIntent().getStringExtra("senderId");
         recipientPhone = getIntent().getStringExtra("number");
         amount = Float.parseFloat(getIntent().getStringExtra("amount"));
-
-        formattedDate = formatDate(Calendar.getInstance());
 
         // Bind UI
         ImageView swipeHandle = findViewById(R.id.swipe_handle);
@@ -68,7 +63,7 @@ public class SendMoneyConfirmActivity extends AppCompatActivity {
         recipientNumberText.setText(recipientPhone);
         amountText.setText(String.format(Locale.getDefault(), "Php %.2f", amount));
         totalAmountText.setText(String.format(Locale.getDefault(), "Php %.2f", amount));
-        transactionDateText.setText(formattedDate);
+        transactionDateText.setText(Util.dateFormatter(new GregorianCalendar()));
         // Load recipient name
         User.getFromPhoneNumber(recipientPhone, User.Details.class, new Database.Data<User.Details>() {
             @Override
@@ -125,7 +120,7 @@ public class SendMoneyConfirmActivity extends AppCompatActivity {
 
         Context ctx = this;
 
-        User.sendMoneyFromPhoneNumber(senderId, recipientPhone, amount, new Database.Data<String>() {
+        User.sendMoney(senderId, recipientPhone, amount, new Database.Data<String>() {
             @Override
             public void onSuccess(String id) {
                 Log.i(TAG, "Transaction success: ID = " + id);
@@ -139,13 +134,8 @@ public class SendMoneyConfirmActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 transactionDone = false;
-                Log.e(TAG, "Transaction failed", e);
+                Log.e(TAG, "Tried to create transaction", e);
             }
         });
-    }
-
-    private String formatDate(Calendar calendar) {
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
-        return sdf.format(calendar.getTime());
     }
 }
