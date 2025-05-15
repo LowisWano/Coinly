@@ -111,7 +111,7 @@ public class QRScanner extends AppCompatActivity {
         imgBtnUseNum.setOnClickListener(this::useNumber);
         btnUseNum.setOnClickListener(this::useNumber);
 
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(this::back);
     }
 
     private void startCamera() {
@@ -170,5 +170,11 @@ public class QRScanner extends AppCompatActivity {
     private void useNumber(View v) {
         Intent intent = new Intent(this, SendMoneyActivity.class);
         startActivity(intent);
+        finish();
+    }
+
+    private void back(View v) {
+        startActivity(new Intent(this, WalletActivity.class));
+        finish();
     }
 }

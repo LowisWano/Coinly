@@ -36,14 +36,16 @@ public class SendMoneyActivity extends AppCompatActivity {
         nextButton = findViewById(R.id.nextButton);
 
         backArrow.setOnClickListener(v -> {
-            Intent intent = new Intent(SendMoneyActivity.this, MainActivity.class);
+            Intent intent = new Intent(SendMoneyActivity.this, WalletActivity.class);
             startActivity(intent);
+            finish();
         });
 
         // Navigate to MyQRActivity
         arrowButton.setOnClickListener(v -> {
             Intent intent = new Intent(SendMoneyActivity.this, MyQRActivity.class);
             startActivity(intent);
+            finish();
         });
 
         // Watch input fields to enable "Next"
@@ -86,6 +88,7 @@ public class SendMoneyActivity extends AppCompatActivity {
             intent.putExtra("amount", amount);
             intent.putExtra("senderId", userId);
             startActivity(intent);
+            finish();
         });
 
         User.get(

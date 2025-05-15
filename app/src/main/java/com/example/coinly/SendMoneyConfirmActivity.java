@@ -118,17 +118,16 @@ public class SendMoneyConfirmActivity extends AppCompatActivity {
     private void performTransaction() {
         transactionDone = true;
 
-        Context ctx = this;
-
         User.sendMoney(senderId, recipientPhone, amount, new Database.Data<String>() {
             @Override
             public void onSuccess(String id) {
                 Log.i(TAG, "Transaction success: ID = " + id);
-                Toast.makeText(ctx, "Transaction successful!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SendMoneyConfirmActivity.this, "Transaction successful!", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(ctx, SendMoneySummaryActivity.class);
+                Intent intent = new Intent(SendMoneyConfirmActivity.this, SendMoneySummaryActivity.class);
                 intent.putExtra("id", id);
                 startActivity(intent);
+//                finish();
             }
 
             @Override

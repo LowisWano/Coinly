@@ -186,8 +186,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private void filterByType(boolean isCoinsAdded) {
         filteredTransactions.clear();
         for (Transaction transaction : allTransactions) {
-            if ((isCoinsAdded && transaction.amount > 0) ||
-                    (!isCoinsAdded && transaction.amount < 0)) {
+            if ((isCoinsAdded && transaction.type == Transaction.Type.Receive) ||
+                    (!isCoinsAdded && transaction.type == Transaction.Type.Deposit)) {
                 filteredTransactions.add(transaction);
             }
         }
