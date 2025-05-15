@@ -115,12 +115,37 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Balance After"
+                            android:text="Wallet Balance After"
                             android:textSize="16sp"
                             android:textColor="#AAAAAA"/>
 
                         <TextView
                             android:id="@+id/balanceAfter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Php 0.00"
+                            android:textSize="16sp"
+                            android:textColor="#2ECC71"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+
+                    <!-- Pocket Balance After -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Pocket Balance After"
+                            android:textSize="16sp"
+                            android:textColor="#AAAAAA"/>
+
+                        <TextView
+                            android:id="@+id/pocketBalanceAfter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Php 0.00"

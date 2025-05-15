@@ -11,14 +11,19 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.coinly.db.Database;
+import com.example.coinly.db.User;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class AddFundsActivity extends AppCompatActivity {
 
     private ImageView backButton;
     private TextView availableBalance;
     private TextView balanceAfter;
+    private TextView pocketBalanceAfter;
     private TextInputEditText amountInput;
     private MaterialButton confirmAddFundsButton;
     
@@ -27,6 +32,10 @@ public class AddFundsActivity extends AppCompatActivity {
     private double targetAmount;
     private int iconResId;
     private boolean isLocked;
+    private String pocketId;
+    private String userId;
+    private double walletBalance;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +43,17 @@ public class AddFundsActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_funds);
         
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
+        
         // Initialize views
         initViews();
         
         // Get data from intent
         getDataFromIntent();
         
-        // Display pocket details
-        displayPocketDetails();
+        // Get user's wallet balance
+        getWalletBalance();
         
         // Set up click listeners
         setupClickListeners();
@@ -54,6 +66,7 @@ public class AddFundsActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
         availableBalance = findViewById(R.id.availableBalance);
         balanceAfter = findViewById(R.id.balanceAfter);
+        pocketBalanceAfter = findViewById(R.id.pocketBalanceAfter);
         amountInput = findViewById(R.id.amountInput);
         confirmAddFundsButton = findViewById(R.id.confirmAddFundsButton);
     }
@@ -66,16 +79,29 @@ public class AddFundsActivity extends AppCompatActivity {
             targetAmount = intent.getDoubleExtra("POCKET_TARGET", 0.0);
             iconResId = intent.getIntExtra("POCKET_ICON", android.R.drawable.ic_menu_directions);
             isLocked = intent.getBooleanExtra("POCKET_LOCKED", false);
+            pocketId = intent.getStringExtra("id");
+            userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
         }
     }
-    
-    private void displayPocketDetails() {
-        // Format and set current amount
-        String formattedBalance = "Php " + String.format("%,.2f", currentAmount);
-        availableBalance.setText(formattedBalance);
-        
-        // Initially set balance after to the same as current amount
-        balanceAfter.setText(formattedBalance);
+
+    private void getWalletBalance() {
+        DocumentReference userRef = db.collection("users").document(userId);
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                walletBalance = documentSnapshot.getDouble("wallet.balance");
+                // Display wallet balance
+                String formattedBalance = "Php " + String.format("%,.2f", walletBalance);
+                availableBalance.setText(formattedBalance);
+                balanceAfter.setText(formattedBalance);
+                
+                // Display initial pocket balance
+                String formattedPocketBalance = "Php " + String.format("%,.2f", currentAmount);
+                pocketBalanceAfter.setText(formattedPocketBalance);
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to get wallet balance", Toast.LENGTH_SHORT).show();
+            finish();
+        });
     }
     
     private void setupClickListeners() {
@@ -104,23 +130,30 @@ public class AddFundsActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                updateBalanceAfter();
+                updateBalancesAfter();
             }
         });
     }
     
-    private void updateBalanceAfter() {
+    private void updateBalancesAfter() {
         try {
             double amountToAdd = 0;
             if (amountInput.getText() != null && !amountInput.getText().toString().isEmpty()) {
                 amountToAdd = Double.parseDouble(amountInput.getText().toString());
             }
             
-            double newBalance = currentAmount + amountToAdd;
-            String formattedNewBalance = "Php " + String.format("%,.2f", newBalance);
-            balanceAfter.setText(formattedNewBalance);
+            // Update wallet balance after
+            double newWalletBalance = walletBalance - amountToAdd;
+            String formattedWalletBalance = "Php " + String.format("%,.2f", newWalletBalance);
+            balanceAfter.setText(formattedWalletBalance);
+            
+            // Update pocket balance after
+            double newPocketBalance = currentAmount + amountToAdd;
+            String formattedPocketBalance = "Php " + String.format("%,.2f", newPocketBalance);
+            pocketBalanceAfter.setText(formattedPocketBalance);
         } catch (NumberFormatException e) {
-            balanceAfter.setText("Php " + String.format("%,.2f", currentAmount));
+            balanceAfter.setText("Php " + String.format("%,.2f", walletBalance));
+            pocketBalanceAfter.setText("Php " + String.format("%,.2f", currentAmount));
         }
     }
     
@@ -133,17 +166,45 @@ public class AddFundsActivity extends AppCompatActivity {
                     Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                if (amountToAdd > walletBalance) {
+                    Toast.makeText(this, "Insufficient wallet balance", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 
-                // Create result intent to pass back the updated amount
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("ADDED_AMOUNT", amountToAdd);
+                // Get references to both documents
+                DocumentReference pocketRef = db.collection("pockets").document(pocketId);
+                DocumentReference userRef = db.collection("users").document(userId);
                 
-                // Show success message
-                Toast.makeText(this, "Added Php " + String.format("%,.2f", amountToAdd) + " to " + pocketName, Toast.LENGTH_SHORT).show();
-                
-                // Set the result and finish
-                setResult(RESULT_OK, resultIntent);
-                finish();
+                // Run a transaction to update both documents atomically
+                db.runTransaction(transaction -> {
+                    // Get current pocket data
+                    double pocketBalance = transaction.get(pocketRef).getDouble("balance");
+                    double userBalance = transaction.get(userRef).getDouble("wallet.balance");
+                    
+                    // Update pocket balance
+                    transaction.update(pocketRef, "balance", pocketBalance + amountToAdd);
+                    
+                    // Update user's wallet balance
+                    transaction.update(userRef, "wallet.balance", userBalance - amountToAdd);
+                    
+                    return null;
+                })
+                .addOnSuccessListener(aVoid -> {
+                    // Show success message
+                    Toast.makeText(this, "Added Php " + String.format("%,.2f", amountToAdd) + " to " + pocketName, Toast.LENGTH_SHORT).show();
+                    
+                    // Create result intent to pass back the updated amount
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("ADDED_AMOUNT", amountToAdd);
+                    
+                    // Set the result and finish
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to add funds: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
             } else {
                 Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show();
             }
