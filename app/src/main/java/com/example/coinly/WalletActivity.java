@@ -100,12 +100,18 @@ public class WalletActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<Pocket> data) {
                 pocketsList = data;
+                if (pocketsList == null) {
+                    pocketsList = new ArrayList<>();
+                }
                 setupPocketsRecyclerView();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Log.e("Wallet", "Tried to get user's pockets", e);
+                Log.e(TAG, "Failed to load pockets", e);
+                Toast.makeText(WalletActivity.this, "Failed to load pockets", Toast.LENGTH_SHORT).show();
+                pocketsList = new ArrayList<>();
+                setupPocketsRecyclerView();
             }
         });
     }
@@ -131,9 +137,14 @@ public class WalletActivity extends AppCompatActivity {
             pocketsRecyclerView.setLayoutManager(layoutManager);
             
             pocketAdapter = new PocketAdapter(pocketsList, (pocket, position) -> {
-                // Handle pocket item click
-                Toast.makeText(this, pocket.name + " pocket clicked", Toast.LENGTH_SHORT).show();
-                // Navigate to pocket details in a real app
+                // Navigate to pocket details
+                Intent intent = new Intent(this, PocketDetailsActivity.class);
+                intent.putExtra("id", pocket.id);
+                intent.putExtra("POCKET_NAME", pocket.name);
+                intent.putExtra("POCKET_TARGET", pocket.target);
+                intent.putExtra("POCKET_CURRENT", pocket.balance);
+                intent.putExtra("POCKET_LOCKED", pocket.locked);
+                startActivity(intent);
             });
 
             pocketsRecyclerView.setAdapter(pocketAdapter);
