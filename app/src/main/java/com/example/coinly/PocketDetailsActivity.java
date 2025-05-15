@@ -19,6 +19,8 @@ import com.google.android.material.button.MaterialButton;
 
 public class PocketDetailsActivity extends AppCompatActivity {
 
+    private static final int ADD_FUNDS_REQUEST_CODE = 100;
+    
     private ImageView pocketIcon;
     private ImageView pocketLockIcon;
     private ImageView backButton;
@@ -126,9 +128,18 @@ public class PocketDetailsActivity extends AppCompatActivity {
         
         // Set add funds button click listener
         addFundsButton.setOnClickListener(v -> {
-            // TODO: Implement add funds functionality
-            // For now, just show a simple message
-            // Toast.makeText(this, "Add funds feature coming soon!", Toast.LENGTH_SHORT).show();
+            // Navigate to Add Funds activity
+            Intent addFundsIntent = new Intent(PocketDetailsActivity.this, AddFundsActivity.class);
+            
+            // Pass the pocket details to the Add Funds activity
+            addFundsIntent.putExtra("POCKET_NAME", pocketName.getText().toString());
+            addFundsIntent.putExtra("POCKET_TARGET", getTargetAmountValue());
+            addFundsIntent.putExtra("POCKET_CURRENT", getCurrentAmountValue());
+            addFundsIntent.putExtra("POCKET_ICON", getIntent().getIntExtra("POCKET_ICON", android.R.drawable.ic_menu_directions));
+            addFundsIntent.putExtra("POCKET_LOCKED", getIntent().getBooleanExtra("POCKET_LOCKED", false));
+            
+            // Start the activity expecting a result
+            startActivityForResult(addFundsIntent, ADD_FUNDS_REQUEST_CODE);
         });
         
         // Set withdraw funds button click listener
@@ -137,5 +148,58 @@ public class PocketDetailsActivity extends AppCompatActivity {
             // For now, just show a simple message
             // Toast.makeText(this, "Withdraw feature coming soon!", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    /**
+     * Extract the current amount value from the currentAmount TextView
+     */
+    private double getCurrentAmountValue() {
+        String currentAmountStr = currentAmount.getText().toString();
+        // Remove the "Php " prefix and any commas
+        currentAmountStr = currentAmountStr.replace("Php ", "").replace(",", "");
+        try {
+            return Double.parseDouble(currentAmountStr);
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+    
+    /**
+     * Extract the target amount value from the targetAmount TextView
+     */
+    private double getTargetAmountValue() {
+        String targetAmountStr = targetAmount.getText().toString();
+        // Remove the "Php " prefix and any commas
+        targetAmountStr = targetAmountStr.replace("Php ", "").replace(",", "");
+        try {
+            return Double.parseDouble(targetAmountStr);
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == ADD_FUNDS_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            // Get the added amount from the result
+            double addedAmount = data.getDoubleExtra("ADDED_AMOUNT", 0.0);
+            
+            // Update the current amount
+            double newCurrentAmount = getCurrentAmountValue() + addedAmount;
+            double targetAmt = getTargetAmountValue();
+            
+            // Calculate new progress percentage
+            int progressPercentage = (int) (newCurrentAmount / targetAmt * 100);
+            
+            // Update the display with new values
+            String formattedCurrent = "Php " + String.format("%,.2f", newCurrentAmount);
+            currentAmount.setText(formattedCurrent);
+            
+            // Update progress bar and percentage
+            pocketProgress.setProgress(Math.min(progressPercentage, 100)); // Cap at 100%
+            progressPercent.setText(Math.min(progressPercentage, 100) + "%");
+        }
     }
 }

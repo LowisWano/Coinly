@@ -21,6 +21,9 @@
             android:name=".ChangePinActivity"
             android:exported="false" />
         <activity
+            android:name=".AddFundsActivity"
+            android:exported="false" />
+        <activity
             android:name=".PocketDetailsActivity"
             android:exported="false" />
         <activity
