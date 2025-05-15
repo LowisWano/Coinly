@@ -2,6 +2,7 @@ package com.example.coinly;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,6 +16,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.widget.ProgressBar;
 
+import com.example.coinly.db.Database;
+import com.example.coinly.db.Pocket;
 import com.google.android.material.button.MaterialButton;
 
 public class PocketDetailsActivity extends AppCompatActivity {
@@ -63,6 +66,8 @@ public class PocketDetailsActivity extends AppCompatActivity {
     }
     
     private void initViews() {
+        String id = getIntent().getStringExtra("id");
+
         pocketIcon = findViewById(R.id.pocketIcon);
         pocketLockIcon = findViewById(R.id.pocketLockIcon);
         backButton = findViewById(R.id.backButton);
@@ -82,6 +87,21 @@ public class PocketDetailsActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Back button NOT found", Toast.LENGTH_LONG).show();
         }
+        Pocket.getFrom(id, new Database.Data<Pocket>() {
+            @Override
+            public void onSuccess(Pocket data) {
+                pocketName.setText(data.name);
+                targetAmount.setText("Php " + Util.amountFormatter(data.target));
+                currentAmount.setText("Php " + Util.amountFormatter(data.balance));
+                pocketProgress.setProgress(data.percent());
+                progressPercent.setText(data.percent() + " %");
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("PocketDetails", "Tried to get pocket", e);
+            }
+        });
     }
     
     private void displayPocketDetails(String name, double targetAmt, double currentAmt, int iconResId, boolean isLocked, int progressPercentage) {

@@ -87,10 +87,32 @@ public class Pocket implements Database.MapParser<Pocket> {
                             continue;
                         }
 
-                        pockets.add(new Pocket().parser(data));
+                        pockets.add(new Pocket().parser(data).withId(doc.getId()));
                     }
 
                     callback.onSuccess(pockets);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void getFrom(String id, Database.Data<Pocket> callback) {
+        Database.db().collection("pockets")
+                .document(id)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        callback.onFailure(new Database.DataNotFound("Pocket not found"));
+                        return;
+                    }
+
+                    Map<String, Object> data = doc.getData();
+
+                    if (data == null){
+                        callback.onFailure(new Database.DataNotFound("Pocket not found"));
+                        return;
+                    }
+
+                    callback.onSuccess(new Pocket().parser(data).withId(doc.getId()));
                 })
                 .addOnFailureListener(callback::onFailure);
     }
