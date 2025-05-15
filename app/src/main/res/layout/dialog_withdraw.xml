@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter amount to withdraw from this pocket"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:layout_marginBottom="16dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount to withdraw"
+        app:startIconDrawable="@drawable/ic_baseline_attach_money_24"
+        app:startIconTint="?attr/colorPrimary"
+        app:boxBackgroundColor="@android:color/transparent"
+        app:errorEnabled="true"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/amountInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:maxLines="1"
+            android:textColor="?attr/colorOnSurface" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout> 
