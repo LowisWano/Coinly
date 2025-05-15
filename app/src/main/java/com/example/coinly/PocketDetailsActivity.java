@@ -22,7 +22,9 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -276,38 +278,60 @@ public class PocketDetailsActivity extends AppCompatActivity {
             return;
         }
         
-        // Get reference to the pocket document
+        // Get references to both documents
         DocumentReference pocketRef = db.collection("pockets").document(pocketId);
+        String userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
+        DocumentReference userRef = db.collection("users").document(userId);
         
-        // Update pocket balance
-        double newBalance = currentAmt - amount;
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("balance", newBalance);
-        
-        pocketRef.update(updates)
-            .addOnSuccessListener(aVoid -> {
-                // Update UI
-                currentAmt = newBalance;
-                int progressPercentage = (int) (currentAmt / targetAmt * 100);
-                
-                // Update display
-                String formattedCurrent = "Php " + String.format("%,.2f", currentAmt);
-                currentAmount.setText(formattedCurrent);
-                pocketProgress.setProgress(progressPercentage);
-                progressPercent.setText(progressPercentage + "%");
-                
-                Toast.makeText(PocketDetailsActivity.this, 
-                    "Successfully withdrew Php " + String.format("%,.2f", amount), 
-                    Toast.LENGTH_SHORT).show();
-                
-                Log.d("PocketDetails", "Withdrawal successful. New balance: " + newBalance);
-            })
-            .addOnFailureListener(e -> {
-                Log.e("PocketDetails", "Withdrawal failed: " + e.getMessage(), e);
-                Toast.makeText(PocketDetailsActivity.this, 
-                    "Failed to withdraw: " + e.getMessage(), 
-                    Toast.LENGTH_SHORT).show();
-            });
+        // Run a transaction to update both documents atomically
+        db.runTransaction(transaction -> {
+            // Get current pocket data
+            DocumentSnapshot pocketSnap = transaction.get(pocketRef);
+            if (!pocketSnap.exists()) {
+                throw new FirebaseFirestoreException("Pocket not found", FirebaseFirestoreException.Code.NOT_FOUND);
+            }
+            
+            // Get current user data
+            DocumentSnapshot userSnap = transaction.get(userRef);
+            if (!userSnap.exists()) {
+                throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
+            }
+            
+            // Get current balances
+            double pocketBalance = pocketSnap.getDouble("balance");
+            double userBalance = userSnap.getDouble("wallet.balance");
+            
+            // Update pocket balance
+            transaction.update(pocketRef, "balance", pocketBalance - amount);
+            
+            // Update user's wallet balance
+            transaction.update(userRef, "wallet.balance", userBalance + amount);
+            
+            return null;
+        })
+        .addOnSuccessListener(aVoid -> {
+            // Update UI
+            currentAmt -= amount;
+            int progressPercentage = (int) (currentAmt / targetAmt * 100);
+            
+            // Update display
+            String formattedCurrent = "Php " + String.format("%,.2f", currentAmt);
+            currentAmount.setText(formattedCurrent);
+            pocketProgress.setProgress(progressPercentage);
+            progressPercent.setText(progressPercentage + "%");
+            
+            Toast.makeText(PocketDetailsActivity.this, 
+                "Successfully withdrew Php " + String.format("%,.2f", amount), 
+                Toast.LENGTH_SHORT).show();
+            
+            Log.d("PocketDetails", "Withdrawal successful. New balance: " + currentAmt);
+        })
+        .addOnFailureListener(e -> {
+            Log.e("PocketDetails", "Withdrawal failed: " + e.getMessage(), e);
+            Toast.makeText(PocketDetailsActivity.this, 
+                "Failed to withdraw: " + e.getMessage(), 
+                Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void showWithdrawDialog() {
