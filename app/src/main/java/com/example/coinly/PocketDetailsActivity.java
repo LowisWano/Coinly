@@ -2,6 +2,7 @@ package com.example.coinly;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +17,13 @@ import androidx.core.view.WindowInsetsCompat;
 import android.widget.ProgressBar;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PocketDetailsActivity extends AppCompatActivity {
 
@@ -31,11 +39,19 @@ public class PocketDetailsActivity extends AppCompatActivity {
     private MaterialButton addFundsButton;
     private MaterialButton withdrawFundsButton;
 
+    private FirebaseFirestore db;
+    private String pocketId;
+    private double targetAmt;
+    private double currentAmt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_pocket_details);
+        
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
         
         // Initialize views
         initViews();
@@ -43,11 +59,19 @@ public class PocketDetailsActivity extends AppCompatActivity {
         // Get data from intent
         Intent intent = getIntent();
         if (intent != null) {
+            // Get pocket ID for Firestore updates
+            pocketId = intent.getStringExtra("id");
+            
             String name = intent.getStringExtra("POCKET_NAME");
-            double targetAmt = intent.getDoubleExtra("POCKET_TARGET", 0.0);
-            double currentAmt = intent.getDoubleExtra("POCKET_CURRENT", 0.0);
+            targetAmt = intent.getDoubleExtra("POCKET_TARGET", 0.0);
+            currentAmt = intent.getDoubleExtra("POCKET_CURRENT", 0.0);
             int iconResId = intent.getIntExtra("POCKET_ICON", android.R.drawable.ic_menu_directions);
             boolean isLocked = intent.getBooleanExtra("POCKET_LOCKED", false);
+            
+            // Log the values for debugging
+            Log.d("PocketDetails", "Received data from intent: ID=" + pocketId +
+                  ", Name=" + name + ", Target=" + targetAmt + 
+                  ", Balance=" + currentAmt + ", Locked=" + isLocked);
             
             // Calculate progress percentage
             int progressPercentage = (int) (currentAmt / targetAmt * 100);
@@ -133,9 +157,100 @@ public class PocketDetailsActivity extends AppCompatActivity {
         
         // Set withdraw funds button click listener
         withdrawFundsButton.setOnClickListener(v -> {
-            // TODO: Implement withdraw funds functionality
-            // For now, just show a simple message
-            // Toast.makeText(this, "Withdraw feature coming soon!", Toast.LENGTH_SHORT).show();
+            boolean isLocked = pocketLockIcon.getVisibility() == View.VISIBLE;
+            if (isLocked) {
+                Toast.makeText(PocketDetailsActivity.this, 
+                    "Cannot withdraw from locked pocket", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            showWithdrawDialog();
         });
+    }
+    
+    private void processWithdrawal(double amount) {
+        // Add debug logs
+        Log.d("PocketDetails", "Processing withdrawal of " + amount + 
+              " from current balance of " + currentAmt);
+        
+        if (amount <= 0) {
+            Toast.makeText(this, "Please enter an amount greater than 0", 
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Set a minimum balance threshold to prevent insufficient fund errors
+        if (currentAmt < 5) {
+            // If balance is too low or zero, show a helpful message
+            Toast.makeText(this, "Cannot withdraw: balance too low or not yet loaded", 
+                Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        if (amount > currentAmt) {
+            Toast.makeText(this, "Insufficient funds in this pocket", 
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Get reference to the pocket document
+        DocumentReference pocketRef = db.collection("pockets").document(pocketId);
+        
+        // Update pocket balance
+        double newBalance = currentAmt - amount;
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("balance", newBalance);
+        
+        pocketRef.update(updates)
+            .addOnSuccessListener(aVoid -> {
+                // Update UI
+                currentAmt = newBalance;
+                int progressPercentage = (int) (currentAmt / targetAmt * 100);
+                
+                // Update display
+                String formattedCurrent = "Php " + String.format("%,.2f", currentAmt);
+                currentAmount.setText(formattedCurrent);
+                pocketProgress.setProgress(progressPercentage);
+                progressPercent.setText(progressPercentage + "%");
+                
+                Toast.makeText(PocketDetailsActivity.this, 
+                    "Successfully withdrew Php " + String.format("%,.2f", amount), 
+                    Toast.LENGTH_SHORT).show();
+                
+                Log.d("PocketDetails", "Withdrawal successful. New balance: " + newBalance);
+            })
+            .addOnFailureListener(e -> {
+                Log.e("PocketDetails", "Withdrawal failed: " + e.getMessage(), e);
+                Toast.makeText(PocketDetailsActivity.this, 
+                    "Failed to withdraw: " + e.getMessage(), 
+                    Toast.LENGTH_SHORT).show();
+            });
+    }
+
+    private void showWithdrawDialog() {
+        // Create TextInputLayout for amount input
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_withdraw, null);
+        TextInputEditText amountInput = dialogView.findViewById(R.id.amountInput);
+        
+        new MaterialAlertDialogBuilder(this)
+            .setTitle("Withdraw Funds")
+            .setView(dialogView)
+            .setPositiveButton("Withdraw", (dialog, which) -> {
+                String amountStr = amountInput.getText().toString();
+                if (!amountStr.isEmpty()) {
+                    try {
+                        double amount = Double.parseDouble(amountStr);
+                        processWithdrawal(amount);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(PocketDetailsActivity.this, 
+                            "Please enter a valid amount", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(PocketDetailsActivity.this, 
+                        "Please enter an amount", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
     }
 }

@@ -87,7 +87,9 @@ public class Pocket implements Database.MapParser<Pocket> {
                             continue;
                         }
 
-                        pockets.add(new Pocket().parser(data));
+                        Pocket pocket = new Pocket().parser(data);
+                        pocket.id = doc.getId();
+                        pockets.add(pocket);
                     }
 
                     callback.onSuccess(pockets);

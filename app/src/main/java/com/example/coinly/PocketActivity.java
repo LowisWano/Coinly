@@ -94,7 +94,21 @@ public class PocketActivity extends AppCompatActivity {
                 public void onViewDetailsClick(Pocket pocket, int position) {
                     // Navigate to pocket details activity
                     Intent intent = new Intent(PocketActivity.this, PocketDetailsActivity.class);
+                    
+                    // First pass the ID for Firestore fetching
                     intent.putExtra("id", pocket.id);
+                    
+                    // Also pass all pocket data directly as fallback
+                    intent.putExtra("POCKET_NAME", pocket.name);
+                    intent.putExtra("POCKET_TARGET", pocket.target);
+                    intent.putExtra("POCKET_CURRENT", pocket.balance);
+                    intent.putExtra("POCKET_LOCKED", pocket.locked);
+                    
+                    // For debugging
+                    Log.d("PocketActivity", "Sending pocket to details: ID=" + pocket.id + 
+                          ", Name=" + pocket.name + ", Target=" + pocket.target + 
+                          ", Balance=" + pocket.balance + ", Locked=" + pocket.locked);
+                    
                     startActivity(intent);
                 }
                 
