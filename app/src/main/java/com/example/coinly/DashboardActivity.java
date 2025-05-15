@@ -6,6 +6,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.coinly.db.Transaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +55,9 @@ public class DashboardActivity extends AppCompatActivity {
         
         // Sample data
         List<Transaction> transactions = new ArrayList<>();
-        transactions.add(new Transaction("Netflix Subscription", "January 27, 2025", -300.00));
-        transactions.add(new Transaction("Youtube Premium", "January 26, 2025", -239.00));
-        transactions.add(new Transaction("24 Chicken", "January 23, 2025", 45.00));
+//        transactions.add(new Transaction("Netflix Subscription", "January 27, 2025", -300.00));
+//        transactions.add(new Transaction("Youtube Premium", "January 26, 2025", -239.00));
+//        transactions.add(new Transaction("24 Chicken", "January 23, 2025", 45.00));
         
         adapter = new TransactionAdapter(transactions);
         transactionsRecyclerView.setAdapter(adapter);

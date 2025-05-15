@@ -21,14 +21,20 @@
             android:name=".SendMoneySummaryActivity"
             android:exported="false" />
         <activity
+            android:name=".AddFundsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PocketDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".MyQRActivity"
             android:exported="false" />
         <activity
             android:name=".SendMoneyConfirmActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".SendMoneyActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".ChangePinActivity"
             android:exported="false" />
@@ -55,7 +61,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

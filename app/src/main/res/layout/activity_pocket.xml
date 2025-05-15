@@ -28,7 +28,7 @@
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/logo_coinly"
+                android:src="@drawable/coinlylogo2"
                 android:contentDescription="Coinly Logo"/>
 
             <TextView
@@ -60,17 +60,23 @@
                 android:layout_marginEnd="24dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/pocket_card" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/addPocketButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:contentDescription="Add new pocket"
-                android:src="@android:drawable/ic_input_add"
-                app:backgroundTint="#3498DB"
-                app:tint="#FFFFFF"/>
         </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addPocketButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="96dp"
+        android:contentDescription="Add new pocket"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#3498DB"
+        app:tint="#FFFFFF"
+        app:fabSize="normal"
+        app:elevation="6dp"
+        app:borderWidth="0dp"
+        app:maxImageSize="24dp"/>
 
     <!-- Bottom Navigation -->
     <include
