@@ -33,6 +33,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -60,7 +61,6 @@ public class QRScannerFragment extends Fragment {
 
     private PreviewView pvScanner;
     private View scannerOverlay;
-    private View fragmentView;
     private LinearLayout buttonLayout;
 
     private BarcodeScanner scanner;
@@ -68,6 +68,7 @@ public class QRScannerFragment extends Fragment {
     private ExecutorService cameraExecutor;
 
     private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private NavController navController;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -85,7 +86,7 @@ public class QRScannerFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        fragmentView = view;
+        navController = Navigation.findNavController(view);
 
         initViews(view);
         initScanner();
@@ -221,9 +222,8 @@ public class QRScannerFragment extends Fragment {
 
                         if (value != null) {
                             requireActivity().runOnUiThread(() -> {
-                                Navigation.findNavController(fragmentView)
-                                        .navigate(QRScannerFragmentDirections
-                                                .actionQrscannerFragmentToSendMoneyFragment(value));
+                                navController.navigate(QRScannerFragmentDirections
+                                        .actionQrscannerFragmentToSendMoneyFragment(value));
                             });
                             break;
                         }
