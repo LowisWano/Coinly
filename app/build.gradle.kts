@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.navigation.safe.args)
 }
 
 android {
@@ -53,4 +54,7 @@ dependencies {
 
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.navigation.safe.args.gradle.plugin) {
+        exclude(group = "xmlpull", module = "xmlpull")
+    }
 }
