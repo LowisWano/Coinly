@@ -3,6 +3,7 @@ package com.example.coinly;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -30,11 +31,39 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize views
         initViews();
-        
-        // Set up listeners
         setupListeners();
+        checkIfLoggedIn();
+    }
+
+    private void checkIfLoggedIn() {
+        String userId = getSharedPreferences("coinly", MODE_PRIVATE).getString("userId", "");
+
+        if (userId.isEmpty()) {
+            return;
+        }
+
+        User.get(
+                userId,
+                User.Credentials.class,
+                new Database.Data<User.Credentials>() {
+                    @Override
+                    public void onSuccess(User.Credentials data) {
+                        Intent intent = new Intent(LoginActivity.this, WalletActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        if (e instanceof Database.DataNotFound) {
+                            return;
+                        }
+
+                        Log.e("Login", "Tried to get user's credentials", e);
+                    }
+                }
+        );
     }
 
     private void initViews() {
@@ -117,12 +146,10 @@ public class LoginActivity extends AppCompatActivity {
 //            Toast.makeText(this, "Forgot password functionality coming soon", Toast.LENGTH_SHORT).show();
 //        });
 
-        // Register click - Navigate to RegisterActivity with animation
         tvRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
             
-            // Apply the slide up animation
             overridePendingTransition(R.anim.slide_up, R.anim.no_change);
         });
     }
@@ -130,24 +157,15 @@ public class LoginActivity extends AppCompatActivity {
     private boolean validateInputs() {
         boolean isValid = true;
         
-        // Validate email
         String email = etEmail.getText().toString().trim();
+
         if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             tilEmail.setError(getString(R.string.invalid_email));
             isValid = false;
         } else {
             tilEmail.setError(null);
         }
-        
-        // Validate password
-        String password = etPassword.getText().toString().trim();
-        if (TextUtils.isEmpty(password) || password.length() < 6) {
-            tilPassword.setError(getString(R.string.invalid_password));
-            isValid = false;
-        } else {
-            tilPassword.setError(null);
-        }
-        
+
         return isValid;
     }
 }
