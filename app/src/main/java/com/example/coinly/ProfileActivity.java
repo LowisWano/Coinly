@@ -79,6 +79,11 @@ public class ProfileActivity extends AppCompatActivity {
 //        });
 
         logoutButton.setOnClickListener(v -> {
+            getSharedPreferences("coinly", MODE_PRIVATE)
+                    .edit()
+                    .remove("userId")
+                    .apply();
+
             Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
