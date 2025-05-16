@@ -61,7 +61,7 @@ public class Transaction implements Database.MapParser<Transaction> {
         return this;
     }
 
-    public Transaction withAmount(float amount) {
+    public Transaction withAmount(double amount) {
         this.amount = amount;
         return this;
     }
