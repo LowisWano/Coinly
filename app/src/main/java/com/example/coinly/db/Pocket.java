@@ -1,11 +1,16 @@
 package com.example.coinly.db;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Pocket implements Database.MapParser<Pocket> {
     public String id;
@@ -71,6 +76,147 @@ public class Pocket implements Database.MapParser<Pocket> {
         this.locked = (Boolean) map.get("locked");
 
         return this;
+    }
+
+    public static void add(String userId, Pocket pocket, Database.Data<Void> callback) {
+        FirebaseFirestore db = Database.db();
+
+        DocumentReference userRef = db.collection("users").document(userId);
+        CollectionReference pocketRef = db.collection("pockets");
+
+        db.runTransaction(transaction -> {
+            DocumentSnapshot userSnap = transaction.get(userRef);
+            Map<String, Object> walletMap = (Map<String, Object>) userSnap.get("wallet");
+
+            if (!(walletMap != null && walletMap.get("balance") instanceof Number)) {
+                throw new Database.DataNotFound("User's wallet not found");
+            }
+
+            double walletBalance = ((Number) Objects.requireNonNull(walletMap.get("balance"))).doubleValue();
+
+            if (walletBalance < pocket.balance) {
+                throw new IllegalArgumentException("Insufficient wallet balance");
+            }
+
+            double updatedBalance = walletBalance - pocket.balance;
+            transaction.update(userRef, "wallet.balance", updatedBalance);
+
+            Map<String, Object> pocketData = Map.of(
+                    "userId", userId,
+                    "name", pocket.name,
+                    "balance", pocket.balance,
+                    "target", pocket.target,
+                    "locked", false
+            );
+
+            transaction.set(pocketRef.document(), pocketData);
+
+            return null;
+        })
+                .addOnSuccessListener(r -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static void withdraw(String userId, String pocketId, double amount, Database.Data<Pocket> callback) {
+        FirebaseFirestore db = Database.db();
+
+        DocumentReference userRef = db.collection("users").document(userId);
+        DocumentReference pocketRef = db.collection("pockets").document(pocketId);
+
+        db.runTransaction(transaction -> {
+            DocumentSnapshot pocketSnapshot = transaction.get(pocketRef);
+
+            if (!pocketSnapshot.exists()) {
+                throw new Database.DataNotFound("Pocket not found");
+            }
+
+            Double pocketBalance = pocketSnapshot.getDouble("balance");
+
+            if (pocketBalance == null || pocketBalance <= 0 || pocketBalance < amount) {
+                throw new IllegalArgumentException("Insufficient pocket balance");
+            }
+
+            DocumentSnapshot userSnapshot = transaction.get(userRef);
+
+            if (!userSnapshot.exists()) {
+                throw new Database.DataNotFound("User not found");
+            }
+
+            Map<String, Object> walletMap = (Map<String, Object>) userSnapshot.get("wallet");
+
+            double walletBalance = 0.0;
+
+            if (walletMap != null && walletMap.get("balance") instanceof Number) {
+                walletBalance = ((Number) Objects.requireNonNull(walletMap.get("balance"))).doubleValue();
+            }
+
+            transaction.update(pocketRef, "balance", pocketBalance - amount);
+            transaction.update(userRef, "wallet.balance", walletBalance + amount);
+
+            return null;
+        }).addOnSuccessListener(r -> {
+            pocketRef.get().addOnSuccessListener(updatedSnapshot -> {
+                if (updatedSnapshot.exists()) {
+                    Pocket data = new Pocket()
+                            .withId(updatedSnapshot.getId())
+                            .parser(updatedSnapshot.getData());
+
+                    callback.onSuccess(data);
+                } else {
+                    callback.onFailure(new Exception("Failed to fetch updated pocket."));
+                }
+            }).addOnFailureListener(callback::onFailure);
+        }).addOnFailureListener(callback::onFailure);
+    }
+
+    public static void deposit(String userId, String pocketId, double amount, Database.Data<Pocket> callback) {
+        FirebaseFirestore db = Database.db();
+
+        DocumentReference userRef = db.collection("pockets").document(pocketId);
+        DocumentReference pocketRef = db.collection("pockets").document(userId);
+
+        db.runTransaction(transaction -> {
+            DocumentSnapshot userSnapshot = transaction.get(userRef);
+            if (!userSnapshot.exists()) {
+                throw new Database.DataNotFound("User not found");
+            }
+
+            Map<String, Object> walletMap = (Map<String, Object>) userSnapshot.get("wallet");
+
+            double walletBalance = 0.0;
+            if (walletMap != null && walletMap.get("balance") instanceof Number) {
+                walletBalance = ((Number) Objects.requireNonNull(walletMap.get("balance"))).doubleValue();
+            }
+
+            if (walletBalance < amount || walletBalance <= 0) {
+                throw new IllegalArgumentException("Insufficient wallet balance");
+            }
+
+            DocumentSnapshot pocketSnapshot = transaction.get(pocketRef);
+            if (!pocketSnapshot.exists()) {
+                throw new Database.DataNotFound("Pocket not found");
+            }
+
+            Double pocketBalance = pocketSnapshot.getDouble("balance");
+            if (pocketBalance == null) pocketBalance = 0.0;
+
+            transaction.update(userRef, "wallet.balance", walletBalance - amount);
+            transaction.update(pocketRef, "balance", pocketBalance + amount);
+
+            return null;
+        }).addOnSuccessListener(r -> {
+            pocketRef.get().addOnSuccessListener(updatedSnapshot -> {
+                if (updatedSnapshot.exists()) {
+                    Pocket data = new Pocket()
+                            .withId(updatedSnapshot.getId())
+                            .parser(updatedSnapshot.getData());
+
+                    callback.onSuccess(data);
+                } else {
+                    callback.onFailure(new Database.DataNotFound("Pocket not found"));
+                }
+            }).addOnFailureListener(callback::onFailure);
+        }).addOnFailureListener(callback::onFailure);
     }
 
     public static void get(String userId, Database.Data<List<Pocket>> callback) {

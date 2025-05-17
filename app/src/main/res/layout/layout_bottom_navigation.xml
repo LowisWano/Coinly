@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#083248"
@@ -28,11 +29,13 @@
             android:duplicateParentState="true">
 
             <ImageView
+                android:id="@+id/homeIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/nav_home_selector"
                 android:duplicateParentState="true"
-                android:contentDescription="Home"/>
+                android:contentDescription="Home"
+                app:tint="@color/yellow_hard" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -58,11 +61,13 @@
             android:duplicateParentState="true">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/nav_wallet_selector"
+                android:id="@+id/pocketsIcon"
+                android:layout_width="19dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="Pocket"
                 android:duplicateParentState="true"
-                android:contentDescription="Pocket"/>
+                android:src="@drawable/nav_wallet_selector"
+                app:tint="@color/white" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,10 +112,12 @@
             android:duplicateParentState="true">
 
             <ImageView
+                android:id="@+id/transactionsIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/nav_transactions_selector"
                 android:duplicateParentState="true"
+                app:tint="@color/white"
                 android:contentDescription="Transactions"/>
 
             <TextView
@@ -137,10 +144,12 @@
             android:duplicateParentState="true">
 
             <ImageView
+                android:id="@+id/profileIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/nav_profile_selector"
                 android:duplicateParentState="true"
+                app:tint="@color/white"
                 android:contentDescription="Profile"/>
 
             <TextView

@@ -1,19 +1,17 @@
 package com.example.coinly;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.coinly.db.Transaction;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
     private List<Transaction> transactions;
@@ -47,9 +45,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.referenceText.setText("Ref Number: " + transaction.id);
 
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, TransactionDetailsActivity.class);
-            intent.putExtra("id", transaction.id);
-            context.startActivity(intent);
+            Navigation.findNavController(v)
+                    .navigate(TransactionsFragmentDirections
+                            .actionTransactionsFragmentToTransactionDetailsFragment(transaction.id));
         });
     }
 

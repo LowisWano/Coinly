@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_home"
+    app:startDestination="@id/walletFragment">
+
+    <fragment
+        android:id="@+id/walletFragment"
+        android:name="com.example.coinly.WalletFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_wallet">
+        <action
+            android:id="@+id/action_walletFragment_to_pocketFragment"
+            app:destination="@id/pocketFragment" />
+        <action
+            android:id="@+id/action_walletFragment_to_transactionsFragment"
+            app:destination="@id/transactionsFragment" />
+        <action
+            android:id="@+id/action_walletFragment_to_pocketDetailsFragment"
+            app:destination="@id/pocketDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pocketFragment"
+        android:name="com.example.coinly.PocketFragment"
+        android:label="Pocket"
+        tools:layout="@layout/fragment_pocket">
+        <action
+            android:id="@+id/action_pocketFragment_to_pocketDetailsFragment"
+            app:destination="@id/pocketDetailsFragment" />
+        <action
+            android:id="@+id/action_pocketFragment_to_addFundsFragment"
+            app:destination="@id/addFundsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/qrscannerFragment"
+        android:name="com.example.coinly.QRScannerFragment"
+        android:label="QRScanner"
+        tools:layout="@layout/fragment_qrscanner">
+        <action
+            android:id="@+id/action_qrscannerFragment_to_sendMoneyFragment"
+            app:destination="@id/sendMoneyFragment" />
+        <action
+            android:id="@+id/action_qrscannerFragment_to_myQRFragment"
+            app:destination="@id/myQRFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/transactionsFragment"
+        android:name="com.example.coinly.TransactionsFragment"
+        android:label="Transactions"
+        tools:layout="@layout/fragment_transactions">
+        <action
+            android:id="@+id/action_transactionsFragment_to_requestTransactionHistoryFragment"
+            app:destination="@id/requestTransactionHistoryFragment" />
+        <action
+            android:id="@+id/action_transactionsFragment_to_transactionDetailsFragment"
+            app:destination="@id/transactionDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.coinly.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_changePinFragment"
+            app:destination="@id/changePinFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pocketDetailsFragment"
+        android:name="com.example.coinly.PocketDetailsFragment"
+        android:label="Pocket Details"
+        tools:layout="@layout/fragment_profile">
+        <argument
+            android:name="pocketId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_pocketDetailsFragment_to_pocketFragment"
+            app:destination="@id/pocketFragment" />
+        <action
+            android:id="@+id/action_pocketDetailsFragment_to_addFundsFragment"
+            app:destination="@id/addFundsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addFundsFragment"
+        android:name="com.example.coinly.AddFundsFragment"
+        android:label="Add Funds"
+        tools:layout="@layout/fragment_add_funds">
+        <argument
+            android:name="pocketId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_addFundsFragment_to_pocketFragment"
+            app:destination="@id/pocketFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/requestTransactionHistoryFragment"
+        android:name="com.example.coinly.RequestTransactionHistoryFragment"
+        android:label="Request Transaction History"
+        tools:layout="@layout/fragment_request_transaction_history" />
+
+    <fragment
+        android:id="@+id/myQRFragment"
+        android:name="com.example.coinly.MyQRFragment"
+        android:label="My QR"
+        tools:layout="@layout/fragment_my_qr" />
+
+    <fragment
+        android:id="@+id/sendMoneyFragment"
+        android:name="com.example.coinly.SendMoneyFragment"
+        android:label="Send Money"
+        tools:layout="@layout/fragment_send_money">
+        <argument
+            android:name="qr_data"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_sendMoneyFragment_to_sendMoneyConfirmFragment"
+            app:destination="@id/sendMoneyConfirmFragment" />
+        <action
+            android:id="@+id/action_sendMoneyFragment_to_myQRFragment"
+            app:destination="@id/myQRFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/sendMoneyConfirmFragment"
+        android:name="com.example.coinly.SendMoneyConfirmFragment"
+        android:label="Send Money Confirm"
+        tools:layout="@layout/fragment_send_money_confirm">
+        <argument
+            android:name="phoneNumber"
+            app:argType="string" />
+        <argument
+            android:name="amount"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_sendMoneyConfirmFragment_to_sendMoneySummaryFragment"
+            app:destination="@id/sendMoneySummaryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/sendMoneySummaryFragment"
+        android:name="com.example.coinly.SendMoneySummaryFragment"
+        android:label="Send Money Summary"
+        tools:layout="@layout/fragment_send_money_summary">
+        <argument
+            android:name="referenceNumber"
+            app:argType="string" />
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <argument
+            android:name="phoneNumber"
+            app:argType="string" />
+        <argument
+            android:name="date"
+            app:argType="string" />
+        <argument
+            android:name="amount"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_sendMoneySummaryFragment_to_qrscannerFragment"
+            app:destination="@id/qrscannerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/transactionDetailsFragment"
+        android:name="com.example.coinly.TransactionDetailsFragment"
+        android:label="Transaction Details"
+        tools:layout="@layout/fragment_transaction_details">
+        <argument
+            android:name="transactionId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="com.example.coinly.HelpFragment"
+        android:label="Help"
+        tools:layout="@layout/fragment_help" />
+
+    <fragment
+        android:id="@+id/changePinFragment"
+        android:name="com.example.coinly.ChangePinFragment"
+        android:label="Change Pin"
+        tools:layout="@layout/fragment_change_pin">
+        <action
+            android:id="@+id/action_changePinFragment_to_createPinFragment"
+            app:destination="@id/createPinFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createPinFragment"
+        android:name="com.example.coinly.CreatePinFragment"
+        android:label="Create Pin"
+        tools:layout="@layout/fragment_create_pin">
+        <action
+            android:id="@+id/action_createPinFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_createPinFragment_to_confirmPinFragment"
+            app:destination="@+id/confirmPinFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmPinFragment"
+        android:name="com.example.coinly.ConfirmPinFragment"
+        android:label="Confirm Pin"
+        tools:layout="@layout/fragment_confirm_pin">
+        <argument
+            android:name="pin"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_confirmPinFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_confirmPinFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+
+</navigation>

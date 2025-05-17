@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.navigation.safe.args)
 }
 
 android {
@@ -42,6 +43,8 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
+    implementation(libs.core)
+    implementation(libs.zxing.android.embedded)
     implementation(libs.barcode.scanning)
     implementation(libs.camera.camera2)
     implementation(libs.camera.lifecycle)
@@ -50,4 +53,10 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+    implementation(libs.navigation.safe.args.gradle.plugin) {
+        exclude(group = "xmlpull", module = "xmlpull")
+    }
 }

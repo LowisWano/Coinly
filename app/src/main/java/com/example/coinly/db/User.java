@@ -1,12 +1,13 @@
 package com.example.coinly.db;
 
+import android.util.Log;
+
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -156,6 +157,28 @@ public class User {
         public String barangay;
         public String city;
         public String zipCode;
+
+        public String formatted() {
+            List<String> addressParts = new ArrayList<>();
+
+            if (this.street != null && !this.street.isEmpty()) {
+                addressParts.add(this.street);
+            }
+
+            if (this.barangay != null && !this.barangay.isEmpty()) {
+                addressParts.add(this.barangay);
+            }
+
+            if (this.city != null && !this.city.isEmpty()) {
+                addressParts.add(this.city);
+            }
+
+            if (this.zipCode != null && !this.zipCode.isEmpty()) {
+                addressParts.add(this.zipCode);
+            }
+
+            return String.join(", ", addressParts);
+        }
 
         public Address withStreet(String street) {
             this.street = street;
@@ -382,8 +405,7 @@ public class User {
                             "address.barangay", address.barangay,
                             "address.city", address.city,
                             "address.zipCode", address.zipCode
-                            )
-
+                    )
                             .addOnSuccessListener(doc -> callback.onSuccess(null))
                             .addOnFailureListener(callback::onFailure);
                 })
@@ -406,8 +428,8 @@ public class User {
     private static void executeMoneyTransfer(
             DocumentReference senderRef,
             DocumentReference recipientRef,
-            float amount,
-            Database.Data<String> callback
+            double amount,
+            Database.Data<Transaction> callback
     ) {
         FirebaseFirestore db = Database.db();
         DocumentReference counterRef = db.collection("counters").document("transactions");
@@ -428,9 +450,11 @@ public class User {
                     transaction.update(recipientRef, "wallet.balance", recipientBalance + amount);
 
                     long nextId = counterSnap.getLong("value") + 1;
+                    String id = Long.toString(nextId);
                     transaction.update(counterRef, "value", nextId);
 
                     Transaction txn = new Transaction()
+                            .withId(id)
                             .withSenderId(senderRef.getId())
                             .withReceiveId(recipientRef.getId())
                             .withAmount(amount)
@@ -444,18 +468,16 @@ public class User {
                     txnMap.put("name", txn.name);
                     txnMap.put("date", txn.date.getTime());
 
-                    String id = Long.toString(nextId);
-
                     DocumentReference txnRef = db.collection("transactions").document(id);
                     transaction.set(txnRef, txnMap);
 
-                    return id;
+                    return txn;
                 })
-                .addOnSuccessListener(id -> callback.onSuccess(id))
+                .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public static void sendMoney(String id, String toPhone, float amount, Database.Data<String> callback) {
+    public static void sendMoney(String id, String toPhone, double amount, Database.Data<Transaction> callback) {
         FirebaseFirestore db = Database.db();
         DocumentReference senderRef = db.collection("users").document(id);
 
