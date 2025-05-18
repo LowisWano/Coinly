@@ -24,6 +24,7 @@
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:src="@drawable/ic_home"
+                android:tint="@color/yellow_hard"
                 android:background="@drawable/circle_background"
                 android:padding="12dp"
                 android:contentDescription="Pocket icon" />

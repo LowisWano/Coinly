@@ -23,13 +23,13 @@ public class Database {
         void onFailure(Exception e);
     }
 
-    public static class KeyAlreadyExists extends Exception {
+    public static class KeyAlreadyExists extends RuntimeException {
         public KeyAlreadyExists(String message) {
             super(message);
         }
     }
 
-    public static class DataNotFound extends Exception {
+    public static class DataNotFound extends RuntimeException {
         public DataNotFound(String message) {
             super(message);
         }

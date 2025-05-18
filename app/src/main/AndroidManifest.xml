@@ -18,48 +18,43 @@
         android:theme="@style/Theme.Coinly"
         tools:targetApi="31">
         <activity
-            android:name=".ChangePinActivity"
+            android:name=".ChangePinFragment"
             android:exported="false" />
         <activity
-            android:name=".PocketDetailsActivity"
+            android:name=".PocketDetailsFragment"
             android:exported="false" />
         <activity
-            android:name=".AddFundsActivity"
+            android:name=".AddFundsFragment"
             android:exported="false" />
         <activity
-            android:name=".PocketDetailsActivity"
+            android:name=".MyQRFragment"
             android:exported="false" />
         <activity
-            android:name=".MyQRActivity"
+            android:name=".SendMoneyConfirmFragment"
             android:exported="false" />
         <activity
-            android:name=".SendMoneyConfirmActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SendMoneyActivity"
+            android:name=".SendMoneyFragment"
             android:exported="true" />
-        <activity android:name=".AddFundsActivity"
+        <activity
+            android:name=".PocketFragment"
             android:exported="false" />
         <activity
-            android:name=".PocketActivity"
+            android:name=".HelpFragment"
             android:exported="false" />
         <activity
-            android:name=".HelpActivity"
+            android:name=".ProfileFragment"
             android:exported="false" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".QRScannerFragment"
             android:exported="false" />
         <activity
-            android:name=".QRScanner"
+            android:name=".RequestTransactionHistoryFragment"
             android:exported="false" />
         <activity
-            android:name=".RequestTransactionHistoryActivity"
+            android:name=".TransactionDetailsFragment"
             android:exported="false" />
         <activity
-            android:name=".TransactionDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LoginActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,22 +62,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".TransactionsFragment"
             android:exported="false" />
         <activity
-            android:name=".CreatePinActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ConfirmPinActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TransactionHistoryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".WalletActivity"
+            android:name=".WalletFragment"
             android:exported="false" />
     </application>
 
